@@ -1,5 +1,5 @@
 import { DarkMode, LightMode, ShoppingCart } from "@mui/icons-material";
-import { AppBar, Badge, IconButton, List, ListItem, Toolbar, Typography } from "@mui/material";
+import { AppBar, Badge, Box, IconButton, List, ListItem, Toolbar, Typography } from "@mui/material";
 import { NavLink } from "react-router-dom";
 
 const midLinks =[
@@ -16,7 +16,14 @@ type Props ={
   toggleMode : ()=> void;
   darkMode: boolean;
 }
-
+ const Navstyles = {color:'inherit',typography:'h6',textDecoration:'none',
+              '&:hover': {
+                color: 'gray.500',
+              },
+              '&.active': {
+                color: 'secondary.main',
+              }
+            }
 export default function NavBar({darkMode,toggleMode}:Props) {
     // const [darkMode,setdarkMode] = useState(false);
     // const changeMode = ()=>{
@@ -25,18 +32,20 @@ export default function NavBar({darkMode,toggleMode}:Props) {
 
   return (
     <AppBar position="fixed">
-        <Toolbar>
-            <Typography component={NavLink} to={'/'} variant="h4">RE-STORE</Typography>
+        <Toolbar sx={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+          <Box sx={{display:'flex',alignItems:'center'}}>
+            <Typography component={NavLink} to={'/'} sx={Navstyles} variant="h4">RE-STORE</Typography>
             <IconButton onClick={toggleMode}>
               {darkMode ? <DarkMode /> : <LightMode sx={{color:'white'}} />}
             </IconButton>
+          </Box>
             <List sx={{display:'flex'}}>
             {midLinks.map(({title,path}) => (
             <ListItem
             component={NavLink}
             to={path}
             key={path}
-            sx={{color:'inherit',typography:'h6'}} 
+            sx={Navstyles} 
             >
               {title.toUpperCase()}
 
@@ -44,9 +53,12 @@ export default function NavBar({darkMode,toggleMode}:Props) {
             ))}
             </List>
 
+
+            <Box sx={{display:'flex',alignItems:'center'}}>
             <IconButton size="large">
-              <Badge badgeContent={4} color="secondary" />
+              <Badge badgeContent={"4"}  color="secondary" >
                 <ShoppingCart />
+              </Badge>
             </IconButton>
 
             <List sx={{display:'flex'}}>
@@ -55,13 +67,14 @@ export default function NavBar({darkMode,toggleMode}:Props) {
             component={NavLink}
             to={path}
             key={path}
-            sx={{color:'inherit',typography:'h6'}} 
+            sx={Navstyles} 
             >
               {title.toUpperCase()}
 
             </ListItem>
             ))}
             </List>
+          </Box>
         </Toolbar>
     </AppBar>
   )
