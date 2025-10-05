@@ -3,10 +3,6 @@ import NavBar from "./NavBar";
 import { Box, Container, createTheme, CssBaseline, ThemeProvider } from "@mui/material";
 import { Outlet } from "react-router-dom";
 
-
-
-
-
 function App() {
   
 
