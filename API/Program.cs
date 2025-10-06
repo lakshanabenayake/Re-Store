@@ -12,6 +12,7 @@ builder.Services.AddDbContext<StoreContext>(opt =>
 });
 
 builder.Services.AddCors();
+builder.Services.AddTransient<API.Middleware.ExceptionMiddleware>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -19,6 +20,7 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+app.UseMiddleware<API.Middleware.ExceptionMiddleware>();
 // Configure the HTTP request pipeline.
 app.UseCors(opt =>
 {
