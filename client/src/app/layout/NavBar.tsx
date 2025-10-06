@@ -1,7 +1,8 @@
 import { DarkMode, LightMode, ShoppingCart } from "@mui/icons-material";
 import { AppBar, Badge, Box, IconButton, LinearProgress, List, ListItem, Toolbar, Typography } from "@mui/material";
 import { NavLink } from "react-router-dom";
-import { useAppSelector } from "../store/store";
+import { useAppDispatch, useAppSelector } from "../store/store";
+import { setDarkMode } from "./uiSlice";
 
 const midLinks =[
   {title:'catalog',path:'/catalog'},
@@ -13,10 +14,6 @@ const rightLinks =[
   {title:'login',path:'/login'},
   {title:'register',path:'/register'}
 ]
-type Props ={
-  toggleMode : ()=> void;
-  darkMode: boolean;
-}
 const Navstyles = {color:'inherit',typography:'h6',textDecoration:'none',
               '&:hover': {
                 color: 'gray.500',
@@ -25,21 +22,17 @@ const Navstyles = {color:'inherit',typography:'h6',textDecoration:'none',
                 color: 'secondary.main',
               }
             }
-export default function NavBar({darkMode,toggleMode}:Props) {
-    // const [darkMode,setdarkMode] = useState(false);
-    // const changeMode = ()=>{
-    //   setdarkMode(darkMode=> darkMode = !darkMode)
-    // };
-    const {isLoading} = useAppSelector(state => state.ui);
-
+export default function NavBar() {
+    const {darkMode,isLoading} = useAppSelector(state => state.ui);
+    const dispatch = useAppDispatch();
 
   return (
-    
+  
     <AppBar position="fixed">
         <Toolbar sx={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
           <Box sx={{display:'flex',alignItems:'center'}}>
             <Typography component={NavLink} to={'/'} sx={Navstyles} variant="h4">RE-STORE</Typography>
-            <IconButton onClick={toggleMode}>
+            <IconButton onClick={() => dispatch(setDarkMode())}>
               {darkMode ? <DarkMode /> : <LightMode sx={{color:'white'}} />}
             </IconButton>
           </Box>
