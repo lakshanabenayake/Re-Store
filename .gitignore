@@ -7,6 +7,12 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+#dotenv environment variable files
+.env
+.env.test
+.env.production
+.env.local
+
 # Node.js dependencies
 node_modules
 dist
