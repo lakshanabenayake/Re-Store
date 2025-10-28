@@ -1,80 +1,80 @@
-// using System;
-// using API.Data;
-// using API.DTOs;
-// using API.Entities;
-// using API.Extensions;
-// using Microsoft.AspNetCore.Mvc;
-// using Microsoft.EntityFrameworkCore;
+using System;
+using API.Data;
+using API.DTOs;
+using API.Entities;
+using API.Extensions;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
-// namespace API.Controllers;
+namespace API.Controllers;
 
-// public class BasketController(StoreContext context) : BaseApiController
-// {
-//     [HttpGet]
-//     public async Task<ActionResult<BasketDto>> GetBasket()
-//     {
-//         var basket = await RetrieveBasket();
+public class BasketController(StoreContext context) : BaseApiController
+{
+    [HttpGet]
+    public async Task<ActionResult<BasketDto>> GetBasket()
+    {
+        var basket = await RetrieveBasket();
 
-//         if (basket == null) return NoContent();
+        if (basket == null) return NoContent();
 
-//         return basket.ToDto();
-//     }
+        return basket.ToDto();
+    }
 
-//     [HttpPost]
-//     public async Task<ActionResult<BasketDto>> AddItemToBasket(int productId, int quantity)
-//     {
-//         var basket = await RetrieveBasket();
-        
-//         basket ??= CreateBasket();
+    [HttpPost]
+    public async Task<ActionResult<BasketDto>> AddItemToBasket(int productId, int quantity)
+    {
+        var basket = await RetrieveBasket();
 
-//         var product = await context.Products.FindAsync(productId);
+        basket ??= CreateBasket();
 
-//         if (product == null) return BadRequest("Problem adding item to basket");
-        
-//         basket.AddItem(product, quantity);
+        var product = await context.Products.FindAsync(productId);
 
-//         var result = await context.SaveChangesAsync() > 0;
+        if (product == null) return BadRequest("Problem adding item to basket");
 
-//         if (result) return CreatedAtAction(nameof(GetBasket), basket.ToDto());
+        basket.AddItem(product, quantity);
 
-//         return BadRequest("Problem updating basket");
-//     }
+        var result = await context.SaveChangesAsync() > 0;
 
-//     [HttpDelete]
-//     public async Task<ActionResult> RemoveBasketItem(int productId, int quantity)
-//     {
-//         var basket = await RetrieveBasket();
+        if (result) return CreatedAtAction(nameof(GetBasket), basket.ToDto());
 
-//         if (basket == null) return BadRequest("Unable to retrieve basket");
+        return BadRequest("Problem updating basket");
+    }
 
-//         basket.RemoveItem(productId, quantity);
+    [HttpDelete]
+    public async Task<ActionResult> RemoveBasketItem(int productId, int quantity)
+    {
+        var basket = await RetrieveBasket();
 
-//         var result = await context.SaveChangesAsync() > 0;
-        
-//         if (result) return Ok();
+        if (basket == null) return BadRequest("Unable to retrieve basket");
 
-//         return BadRequest("Problem updating basket");
-//     }
+        basket.RemoveItem(productId, quantity);
 
-//     private Basket CreateBasket()
-//     {
-//         var basketId = Guid.NewGuid().ToString();
-//         var cookieOptions = new CookieOptions
-//         {
-//             IsEssential = true,
-//             Expires = DateTime.UtcNow.AddDays(30)
-//         };
-//         Response.Cookies.Append("basketId", basketId, cookieOptions);
-//         var basket = new Basket {BasketId = basketId};
-//         context.Baskets.Add(basket);
-//         return basket;
-//     }
+        var result = await context.SaveChangesAsync() > 0;
 
-//     private async Task<Basket?> RetrieveBasket()
-//     {
-//         return await context.Baskets
-//             .Include(x => x.Items)
-//             .ThenInclude(x => x.Product)
-//             .FirstOrDefaultAsync(x => x.BasketId == Request.Cookies["basketId"]);
-//     }
-// }
+        if (result) return Ok();
+
+        return BadRequest("Problem updating basket");
+    }
+
+    private Basket CreateBasket()
+    {
+        var basketId = Guid.NewGuid().ToString();
+        var cookieOptions = new CookieOptions
+        {
+            IsEssential = true,
+            Expires = DateTime.UtcNow.AddDays(30)
+        };
+        Response.Cookies.Append("basketId", basketId, cookieOptions);
+        var basket = new Basket { BasketId = basketId };
+        context.Baskets.Add(basket);
+        return basket;
+    }
+
+    private async Task<Basket?> RetrieveBasket()
+    {
+        return await context.Baskets
+            .Include(x => x.Items)
+            .ThenInclude(x => x.Product)
+            .FirstOrDefaultAsync(x => x.BasketId == Request.Cookies["basketId"]);
+    }
+}

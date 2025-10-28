@@ -39,7 +39,7 @@ var corsOrigin = Environment.GetEnvironmentVariable("CORS_ORIGIN") ?? "http://lo
 
 app.UseCors(opt =>
 {
-    opt.AllowAnyHeader().AllowAnyMethod().WithOrigins(corsOrigin);
+    opt.AllowAnyHeader().AllowAnyMethod().AllowCredentials().WithOrigins(corsOrigin);
     Console.WriteLine("CORS Policy Applied");
 });
 

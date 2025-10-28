@@ -1,5 +1,5 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
-import baseQueryWithErrorHandling from '../../app/api/baseAPI';
+import { baseQueryWithErrorHandling } from '../../app/api/baseAPI';
 
 
 
