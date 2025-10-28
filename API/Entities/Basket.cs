@@ -1,56 +1,49 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace API.Entities
+namespace API.Entities;
+
+public class Basket
 {
-    public class Basket
+    public int Id { get; set; }
+    public required string BasketId { get; set; }
+    public List<BasketItem> Items { get; set; } = [];
+
+    public void AddItem(Product product, int quantity)
     {
-        public int Id { get; set; }
-        public required string BasketId { get; set; }
-        public List<BasketItem> Items { get; set; } = [];
+        if (product == null) ArgumentNullException.ThrowIfNull(product);
+        if (quantity <= 0) throw new ArgumentException("Quantity should be greater than zero", 
+            nameof(quantity));
 
+        var existingItem = FindItem(product.Id);
 
-        public void AddItem(Product product, int quantity)
+        if (existingItem == null)
         {
-            if (product == null) ArgumentNullException.ThrowIfNull(product);
-            if (quantity <= 0) throw new ArgumentException("Quantity must be greater than zero", nameof(quantity));
-            var existingItem = FindItem(product.Id);
-
-            if(existingItem == null)
+            Items.Add(new BasketItem
             {
-                var basketItem = new BasketItem
-                {
-                    Product = product,
-                    Quantity = quantity
-                };
-                Items.Add(basketItem);
-            }
-            else
-            {
-                existingItem.Quantity += quantity;
-            }
+                Product = product,
+                Quantity = quantity
+            });
         }
-
-        private BasketItem? FindItem(int productId)
+        else
         {
-            return Items.FirstOrDefault(i => i.ProductId == productId);
+            existingItem.Quantity += quantity;
         }
-        
+    }
 
-        public void RemoveItem(int productId,int quantity)
-        {
-            if (quantity <= 0) throw new ArgumentException("Quantity must be greater than zero", nameof(quantity));
-            var item = FindItem(productId);
-            if (item != null)
-            {
-                item.Quantity -= quantity;
-                if (item.Quantity <= 0)
-                {
-                    Items.Remove(item);
-                }
-            }
-        }
+    public void RemoveItem(int productId, int quantity)
+    {
+        if (quantity <= 0) throw new ArgumentException("Quantity should be greater than zero", 
+            nameof(quantity));
+
+        var item = FindItem(productId);
+        if (item == null) return;
+
+        item.Quantity -= quantity;
+        if (item.Quantity <= 0) Items.Remove(item);
+    }
+
+    private BasketItem? FindItem(int productId)
+    {
+        return Items.FirstOrDefault(item => item.ProductId == productId);
     }
 }
