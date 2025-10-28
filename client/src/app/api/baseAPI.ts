@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import { router } from "../models/routes/Routes";
 
 const customBaseQuery = fetchBaseQuery({
-    baseUrl: 'https://localhost:5001/api',
+    baseUrl: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
     // prepareHeaders: (headers) => {
     //     // Add any custom headers here, e.g., authentication tokens
     //     headers.set('Authorization', `Bearer ${localStorage.getItem('token')}`);

@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  # SQL Server Database
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: restore-db
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=${DB_PASSWORD:-YourStrong@Passw0rd}
+      - MSSQL_PID=Express
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver-data:/var/opt/mssql
+    networks:
+      - restore-network
+    healthcheck:
+      test: /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "${DB_PASSWORD:-YourStrong@Passw0rd}" -Q "SELECT 1" || exit 1
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+
+  # ASP.NET Core API
+  api:
+    build:
+      context: ./API
+      dockerfile: Dockerfile
+    container_name: restore-api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - DB_SERVER=db
+      - DB_NAME=${DB_NAME:-RestoreDb}
+      - DB_USER=sa
+      - DB_PASSWORD=${DB_PASSWORD:-YourStrong@Passw0rd}
+      - CORS_ORIGIN=http://localhost
+    ports:
+      - "5000:5000"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - restore-network
+    restart: unless-stopped
+
+  # React Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: restore-client
+    ports:
+      - "80:80"
+    depends_on:
+      - api
+    networks:
+      - restore-network
+    restart: unless-stopped
+
+volumes:
+  sqlserver-data:
+    driver: local
+
+networks:
+  restore-network:
+    driver: bridge
