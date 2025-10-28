@@ -6,13 +6,10 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 
-# Copy environment file for production
-COPY .env.production ./
-
-# Copy source code
+# Copy source code and environment files
 COPY . .
 
-# Build the app (uses .env.production)
+# Build the app (uses .env.production automatically)
 RUN npm run build
 
 # Production stage with nginx
