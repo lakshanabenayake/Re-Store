@@ -27,8 +27,13 @@ builder.Services.AddDbContext<StoreContext>(opt =>
     opt.UseSqlServer(connectionString);
 });
 
-// Configure Cloudinary settings
-builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("Cloudinary"));
+// Configure Cloudinary settings from environment variables
+builder.Services.Configure<CloudinarySettings>(options =>
+{
+    options.CloudName = Environment.GetEnvironmentVariable("CLOUDINARY_CLOUD_NAME") ?? "";
+    options.ApiKey = Environment.GetEnvironmentVariable("CLOUDINARY_API_KEY") ?? "";
+    options.ApiSecret = Environment.GetEnvironmentVariable("CLOUDINARY_API_SECRET") ?? "";
+});
 
 // Register services
 builder.Services.AddScoped<ImageService>();

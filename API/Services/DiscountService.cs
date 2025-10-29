@@ -6,9 +6,9 @@ namespace API.Services;
 
 public class DiscountService
 {
-    public DiscountService(IConfiguration config)
+    public DiscountService()
     {
-        StripeConfiguration.ApiKey = config["StripeSettings:SecretKey"];
+        StripeConfiguration.ApiKey = Environment.GetEnvironmentVariable("STRIPE_SECRET_KEY");
     }
 
     public async Task<AppCoupon?> GetCouponFromPromoCode(string code)

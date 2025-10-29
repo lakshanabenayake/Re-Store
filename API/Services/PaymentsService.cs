@@ -3,12 +3,12 @@ using Stripe;
 
 namespace API.Services;
 
-public class PaymentsService(IConfiguration config, DiscountService discountService)
+public class PaymentsService(DiscountService discountService)
 {
     public async Task<PaymentIntent> CreateOrUpdatePaymentIntent(Basket basket,
         bool removeDiscount = false)
     {
-        StripeConfiguration.ApiKey = config["StripeSettings:SecretKey"];
+        StripeConfiguration.ApiKey = Environment.GetEnvironmentVariable("STRIPE_SECRET_KEY");
 
         var service = new PaymentIntentService();
 

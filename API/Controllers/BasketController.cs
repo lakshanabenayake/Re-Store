@@ -15,19 +15,38 @@ public class BasketController(StoreContext context,
     [HttpGet]
     public async Task<ActionResult<BasketDto>> GetBasket()
     {
+        var basketIdFromCookie = Request.Cookies["basketId"];
+        Console.WriteLine($"GetBasket - Cookie basketId: {basketIdFromCookie}");
+
         var basket = await RetrieveBasket();
 
-        if (basket == null) return NoContent();
+        if (basket == null)
+        {
+            Console.WriteLine("GetBasket - No basket found");
+            return NoContent();
+        }
 
+        Console.WriteLine($"GetBasket - Basket found with {basket.Items.Count} items");
         return basket.ToDto();
     }
 
     [HttpPost]
     public async Task<ActionResult<BasketDto>> AddItemToBasket(int productId, int quantity)
     {
+        var basketIdFromCookie = Request.Cookies["basketId"];
+        Console.WriteLine($"AddItemToBasket - Cookie basketId: {basketIdFromCookie}");
+
         var basket = await RetrieveBasket();
 
-        basket ??= CreateBasket();
+        if (basket == null)
+        {
+            Console.WriteLine("AddItemToBasket - Creating new basket");
+            basket = CreateBasket();
+        }
+        else
+        {
+            Console.WriteLine($"AddItemToBasket - Existing basket found: {basket.BasketId}");
+        }
 
         var product = await context.Products.FindAsync(productId);
 
@@ -37,7 +56,11 @@ public class BasketController(StoreContext context,
 
         var result = await context.SaveChangesAsync() > 0;
 
-        if (result) return CreatedAtAction(nameof(GetBasket), basket.ToDto());
+        if (result)
+        {
+            Console.WriteLine($"AddItemToBasket - Success. Basket now has {basket.Items.Count} items");
+            return CreatedAtAction(nameof(GetBasket), basket.ToDto());
+        }
 
         return BadRequest("Problem updating basket");
     }
@@ -107,12 +130,19 @@ public class BasketController(StoreContext context,
     private Basket CreateBasket()
     {
         var basketId = Guid.NewGuid().ToString();
+        Console.WriteLine($"CreateBasket - New basketId: {basketId}");
+
         var cookieOptions = new CookieOptions
         {
             IsEssential = true,
-            Expires = DateTime.UtcNow.AddDays(30)
+            Expires = DateTime.UtcNow.AddDays(30),
+            HttpOnly = false, // Allow JavaScript to read the cookie
+            SameSite = SameSiteMode.None, // Required for cross-origin
+            Secure = true // Required when SameSite=None
         };
         Response.Cookies.Append("basketId", basketId, cookieOptions);
+        Console.WriteLine("CreateBasket - Cookie set");
+
         var basket = new Basket { BasketId = basketId };
         context.Baskets.Add(basket);
         return basket;

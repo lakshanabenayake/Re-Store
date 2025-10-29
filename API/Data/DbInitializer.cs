@@ -6,8 +6,9 @@ namespace API.Data
 {
     public class DbInitializer
     {
-        public static void InitDb(WebApplication app){
-            using var scope  = app.Services.CreateScope();
+        public static void InitDb(WebApplication app)
+        {
+            using var scope = app.Services.CreateScope();
 
             var context = scope.ServiceProvider.GetRequiredService<StoreContext>()
             ?? throw new InvalidOperationException("Failed to retrieve store context");
@@ -18,12 +19,14 @@ namespace API.Data
 
         private static void SeedData(StoreContext context)
         {
-           context.Database.Migrate();
-           if (context.Products.Any()) return;
+            // Drop and recreate the database (use only in development)
+            context.Database.EnsureDeleted();
+            context.Database.Migrate();
+            if (context.Products.Any()) return;
 
-           var Products = new List<Product>
+            var Products = new List<Product>
            {
-            		new() {
+                    new() {
                     Name = "Angular Speedster Board 2000",
                     Description =
                         "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Maecenas porttitor congue massa. Fusce posuere, magna sed pulvinar ultricies, purus lectus malesuada libero, sit amet commodo magna eros quis urna.",
@@ -205,7 +208,7 @@ namespace API.Data
 
             context.Products.AddRange(Products);
             context.SaveChanges();
-            
+
         }
 
     }

@@ -6,15 +6,24 @@ import { Product } from "@/lib/models/product"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { currencyFormat } from "@/lib/util"
+import { useAddBasketItemMutation } from "@/lib/api/basketApi"
+import { toast } from "sonner"
 
 type Props = {
   product: Product
 }
 
 export default function ProductCard({ product }: Props) {
-  const handleAddToCart = () => {
-    // TODO: Implement add to cart functionality
-    console.log('Add to cart:', product.id)
+  const [addBasketItem, { isLoading }] = useAddBasketItemMutation();
+
+  const handleAddToCart = async () => {
+    try {
+      await addBasketItem({ product, quantity: 1 }).unwrap();
+      toast.success(`${product.name} added to cart!`);
+    } catch (error) {
+      toast.error('Failed to add item to cart');
+      console.error('Add to cart error:', error);
+    }
   }
 
   return (
@@ -39,10 +48,11 @@ export default function ProductCard({ product }: Props) {
       <CardFooter className="p-4 pt-0 flex gap-2">
         <Button 
           onClick={handleAddToCart}
+          disabled={isLoading}
           className="flex-1"
           size="sm"
         >
-          Add to Cart
+          {isLoading ? 'Adding...' : 'Add to Cart'}
         </Button>
         <Button 
           asChild

@@ -12,7 +12,7 @@ using Stripe;
 namespace API.Controllers;
 
 public class PaymentsController(PaymentsService paymentsService,
-    StoreContext context, IConfiguration config, ILogger<PaymentsController> logger)
+    StoreContext context, ILogger<PaymentsController> logger)
         : BaseApiController
 {
     [Authorize]
@@ -108,9 +108,9 @@ public class PaymentsController(PaymentsService paymentsService,
             order.OrderStatus = OrderStatus.PaymentReceived;
         }
 
-        var basket = await context.Baskets.FirstOrDefaultAsync(x => 
+        var basket = await context.Baskets.FirstOrDefaultAsync(x =>
             x.PaymentIntentId == intent.Id);
-            
+
         if (basket != null) context.Baskets.Remove(basket);
 
         await context.SaveChangesAsync();
@@ -121,7 +121,7 @@ public class PaymentsController(PaymentsService paymentsService,
         try
         {
             return EventUtility.ConstructEvent(json,
-                Request.Headers["Stripe-Signature"], config["StripeSettings:WhSecret"]);
+                Request.Headers["Stripe-Signature"], Environment.GetEnvironmentVariable("STRIPE_WEBHOOK_SECRET"));
         }
         catch (Exception ex)
         {
