@@ -1,17 +1,30 @@
 "use client"
 
 import Link from "next/link"
-import { Search, ShoppingCart, User, Menu } from "lucide-react"
+import { Search, ShoppingCart, User, Menu ,Sun, Moon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Badge } from "@/components/ui/badge"
 import { useFetchBasketQuery } from "@/lib/api/basketApi"
+import { useTheme } from "next-themes"
+import { useEffect, useState } from "react"
 
 export function Navbar() {
+  const { theme, setTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
 
   const {data: basket} = useFetchBasketQuery();
   const itemCount = basket?.items.reduce((sum, item) => sum + item.quantity, 0) || 0;
+
+  // useEffect only runs on the client, so now we can safely show the UI
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) {
+    return null
+  }
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -44,9 +57,24 @@ export function Navbar() {
 
         {/* Actions */}
         <div className="flex items-center gap-4">
+          
           <Button variant="ghost" size="icon" className="hidden md:flex">
             <Search className="h-5 w-5 md:hidden" />
           </Button>
+
+            {/* Theme Toggle Button */}
+            <Button 
+              variant="ghost" 
+              size="icon"
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            >
+              {theme === "dark" ? (
+                <Sun className="h-5 w-5" />
+              ) : (
+                <Moon className="h-5 w-5" />
+              )}
+            </Button>
+        
 
           <Link href="/login">
             <Button variant="ghost" size="icon">
@@ -78,6 +106,26 @@ export function Navbar() {
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input type="search" placeholder="Search products..." className="pl-10" />
                 </div>
+                
+                {/* Mobile Theme Toggle */}
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start"
+                  onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                >
+                  {theme === "dark" ? (
+                    <>
+                      <Sun className="h-4 w-4 mr-2" />
+                      Light Mode
+                    </>
+                  ) : (
+                    <>
+                      <Moon className="h-4 w-4 mr-2" />
+                      Dark Mode
+                    </>
+                  )}
+                </Button>
+
                 <Link href="/catalog" className="text-lg font-medium">
                   Shop
                 </Link>
