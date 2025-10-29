@@ -17,7 +17,6 @@ export const baseQueryWithErrorHandling = async (
   extraOptions: object
 ) => {
   api.dispatch(startLoading());
-  await sleep();
   const result = await customBaseQuery(args, api, extraOptions);
   console.log(result);
   api.dispatch(stopLoading());

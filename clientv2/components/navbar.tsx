@@ -6,10 +6,12 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Badge } from "@/components/ui/badge"
-import { useState } from "react"
+import { useFetchBasketQuery } from "@/lib/api/basketApi"
 
 export function Navbar() {
-  const [cartCount] = useState(3)
+
+  const {data: basket} = useFetchBasketQuery();
+  const itemCount = basket?.items.reduce((sum, item) => sum + item.quantity, 0) || 0;
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -55,9 +57,9 @@ export function Navbar() {
           <Link href="/cart" className="relative">
             <Button variant="ghost" size="icon">
               <ShoppingCart className="h-5 w-5" />
-              {cartCount > 0 && (
+              {itemCount > 0 && (
                 <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs">
-                  {cartCount}
+                  {itemCount}
                 </Badge>
               )}
             </Button>

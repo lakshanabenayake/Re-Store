@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -10,9 +10,13 @@ import { Slider } from "@/components/ui/slider"
 import { useFetchProductsQuery } from "@/lib/api/catalogApi"
 import ProductList from "@/components/catalog/ProductList"
 import { Product } from "@/lib/models/product"
+import { useSearchParams } from "next/navigation"
 
 export default function CatalogPage() {
   const { data: products, isLoading, error } = useFetchProductsQuery()
+  const searchParams = useSearchParams()
+  const typeParam = searchParams.get('category')
+  
   const [selectedCategories, setSelectedCategories] = useState<string[]>([])
   const [priceRange, setPriceRange] = useState([0, 50000]) // Price in cents
   const [sortBy, setSortBy] = useState("featured")
@@ -22,10 +26,36 @@ export default function CatalogPage() {
     ? Array.from(new Set(products.map((p) => p.type)))
     : []
 
+  // Set selected category from URL parameter
+  useEffect(() => {
+    console.log("URL typeParam:", typeParam)
+    console.log("Available categories:", categories)
+    
+    if (typeParam && categories.length > 0) {
+      // Try exact match first
+      if (categories.includes(typeParam)) {
+        console.log("Exact match found, setting category:", typeParam)
+        setSelectedCategories([typeParam])
+      } else {
+        // Try case-insensitive match
+        const matchedCategory = categories.find(
+          cat => cat.toLowerCase() === typeParam.toLowerCase()
+        )
+        if (matchedCategory) {
+          console.log("Case-insensitive match found, setting category:", matchedCategory)
+          setSelectedCategories([matchedCategory])
+        } else {
+          console.log("No matching category found for:", typeParam)
+        }
+      }
+    }
+  }, [typeParam, categories.length]) // Track categories.length instead of join
+
   const toggleCategory = (category: string) => {
     setSelectedCategories((prev) =>
       prev.includes(category) ? prev.filter((c) => c !== category) : [...prev, category],
     )
+    console.log("Toggled category:", category)
   }
 
   // Filter products
