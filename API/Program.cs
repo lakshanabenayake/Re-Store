@@ -1,4 +1,6 @@
 using API.Data;
+using API.RequestHelpers;
+using API.Services;
 using Microsoft.EntityFrameworkCore;
 using DotNetEnv;
 
@@ -9,6 +11,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container
 builder.Services.AddControllers();
+
+// Add AutoMapper
+builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
 // Build connection string from environment variables
 var dbServer = Environment.GetEnvironmentVariable("DB_SERVER");
@@ -21,6 +26,14 @@ builder.Services.AddDbContext<StoreContext>(opt =>
 {
     opt.UseSqlServer(connectionString);
 });
+
+// Configure Cloudinary settings
+builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("Cloudinary"));
+
+// Register services
+builder.Services.AddScoped<ImageService>();
+builder.Services.AddScoped<PaymentsService>();
+builder.Services.AddScoped<DiscountService>();
 
 builder.Services.AddCors();
 builder.Services.AddTransient<API.Middleware.ExceptionMiddleware>();

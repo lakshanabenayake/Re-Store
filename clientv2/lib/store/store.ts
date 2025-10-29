@@ -1,13 +1,16 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { useDispatch, useSelector } from "react-redux";
 import uiSlice from "./slices/uiSlice";
+import { catalogApi } from "../api/catalogApi";
 
 export const makeStore = () => {
   return configureStore({
     reducer: {
+      [catalogApi.reducerPath]: catalogApi.reducer,
       ui: uiSlice,
     },
-    middleware: (getDefaultMiddleware) => getDefaultMiddleware(),
+    middleware: (getDefaultMiddleware) =>
+      getDefaultMiddleware().concat(catalogApi.middleware),
   });
 };
 
