@@ -37,15 +37,12 @@ export function Navbar() {
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-8">
+        <nav className="hidden md:flex items-center gap-10">
           <Link href="/catalog" className="text-sm font-medium text-foreground hover:text-primary transition-colors">
             Products
           </Link>
           <Link href="/about" className="text-sm font-medium text-foreground hover:text-primary transition-colors">
             About
-          </Link>
-          <Link href="/seller" className="text-sm font-medium text-foreground hover:text-primary transition-colors">
-            Sellers
           </Link>
         </nav>
 

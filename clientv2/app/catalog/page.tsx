@@ -104,7 +104,7 @@ export default function CatalogPage() {
   return (
     <div className="container mx-auto px-4 py-12">
       <div className="mb-8">
-        <h1 className="font-serif text-4xl md:text-5xl font-light mb-4">Shop All Products</h1>
+        <h1 className="font-medium text-4xl md:text-5xl font-light mb-4">Shop All Products</h1>
         <p className="text-muted-foreground">Discover our complete collection of curated premium products.</p>
       </div>
 
