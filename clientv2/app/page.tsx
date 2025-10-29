@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { ArrowRight, Package, Shield, Truck } from "lucide-react"
 import Image from "next/image"
+import ReduxTest from "@/components/ReduxTest"
 
 export default function HomePage() {
   const featuredProducts = [
@@ -56,6 +57,13 @@ export default function HomePage() {
 
   return (
     <div className="flex flex-col">
+      {/* Redux Test Component */}
+      <section className="py-8 bg-background">
+        <div className="container mx-auto px-4">
+          <ReduxTest />
+        </div>
+      </section>
+
       {/* Hero Section */}
       <section className="relative h-[90vh] flex items-center justify-center bg-secondary">
         <div className="container mx-auto px-4 text-center">
