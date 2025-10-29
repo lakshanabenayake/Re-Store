@@ -1,80 +1,84 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { ArrowRight, Package, Shield, Truck } from "lucide-react"
+import { ArrowRight, Shield, Truck, TrendingUp } from "lucide-react"
 import Image from "next/image"
 
 export default function HomePage() {
   const featuredProducts = [
     {
       id: 1,
-      name: "Minimalist Watch",
+      name: "Premium Electronics",
       price: 299,
       image: "/minimalist-luxury-watch.jpg",
-      category: "Accessories",
+      category: "Electronics",
     },
     {
       id: 2,
-      name: "Leather Bag",
+      name: "Home Essentials",
       price: 449,
       image: "/premium-leather-bag.png",
-      category: "Bags",
+      category: "Home",
     },
     {
       id: 3,
-      name: "Ceramic Vase",
+      name: "Garden Tools",
       price: 129,
       image: "/modern-ceramic-vase.png",
-      category: "Home",
+      category: "Garden",
     },
     {
       id: 4,
-      name: "Wool Blanket",
+      name: "Apparel Collection",
       price: 189,
       image: "/luxury-wool-blanket.jpg",
-      category: "Home",
+      category: "Apparel",
     },
   ]
 
   const categories = [
     {
-      name: "Fashion",
+      name: "Electronics",
       image: "/minimalist-fashion-clothing.jpg",
-      count: 124,
+      count: 324,
     },
     {
-      name: "Home & Living",
+      name: "Home & Garden",
       image: "/modern-home-decor.png",
-      count: 89,
+      count: 456,
     },
     {
-      name: "Accessories",
+      name: "Apparel",
       image: "/luxury-accessories.png",
-      count: 156,
+      count: 678,
     },
   ]
 
   return (
     <div className="flex flex-col">
-      {/* Hero Section */}
-      <section className="relative h-[90vh] flex items-center justify-center bg-secondary">
+      <section className="relative h-[90vh] flex items-center justify-center bg-primary text-primary-foreground">
         <div className="container mx-auto px-4 text-center">
-          <h1 className="font-serif text-5xl md:text-7xl lg:text-8xl font-light tracking-tight text-balance mb-6">
-            Curated excellence meets timeless design
+          <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-balance mb-6">
+            Your Trusted Retail Partner
           </h1>
-          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8 leading-relaxed">
-            Discover our carefully selected collection of premium products that blend functionality with exquisite
-            craftsmanship.
+          <p className="text-lg md:text-xl max-w-2xl mx-auto mb-8 leading-relaxed opacity-90">
+            Discover quality products across electronics, home, garden, and apparel. Trusted by millions of customers
+            worldwide.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button asChild size="lg" className="text-base">
+            <Button asChild size="lg" className="text-base bg-background text-primary hover:bg-background/90">
               <Link href="/catalog">
-                Explore Collection
+                Shop Now
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
-            <Button asChild variant="outline" size="lg" className="text-base bg-transparent">
-              <Link href="/about">Learn Our Story</Link>
+            <Button
+              asChild
+              variant="outline"
+              size="lg"
+              className="text-base border-primary-foreground text-primary-foreground hover:bg-primary-foreground/10 bg-transparent"
+            >
+              <Link href="/about">Learn More</Link>
             </Button>
           </div>
         </div>
@@ -84,9 +88,9 @@ export default function HomePage() {
       <section className="py-24 bg-background">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="font-serif text-4xl md:text-5xl font-light mb-4">Shop by Category</h2>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4">Shop by Category</h2>
             <p className="text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              Explore our curated collections across different lifestyle categories.
+              Browse our extensive selection across multiple product categories.
             </p>
           </div>
 
@@ -103,7 +107,7 @@ export default function HomePage() {
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-6">
                       <div className="text-white">
-                        <h3 className="font-serif text-2xl mb-1">{category.name}</h3>
+                        <h3 className="text-2xl font-bold mb-1">{category.name}</h3>
                         <p className="text-sm text-white/80">{category.count} products</p>
                       </div>
                     </div>
@@ -119,9 +123,9 @@ export default function HomePage() {
       <section className="py-24 bg-secondary">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="font-serif text-4xl md:text-5xl font-light mb-4">Featured Collection</h2>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4">Featured Products</h2>
             <p className="text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              Handpicked items that exemplify our commitment to quality and design excellence.
+              Explore our best-selling items across all categories.
             </p>
           </div>
 
@@ -139,8 +143,8 @@ export default function HomePage() {
                   </div>
                   <div className="p-4">
                     <p className="text-xs text-muted-foreground mb-1">{product.category}</p>
-                    <h3 className="font-medium mb-2">{product.name}</h3>
-                    <p className="text-muted-foreground">${product.price}</p>
+                    <h3 className="font-semibold mb-2">{product.name}</h3>
+                    <p className="text-primary font-semibold">${product.price}</p>
                   </div>
                 </Card>
               </Link>
@@ -155,57 +159,79 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Value Proposition */}
       <section className="py-24 bg-background">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
             <div className="text-center">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-secondary mb-6">
-                <Shield className="h-8 w-8" />
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-lg bg-primary/10 mb-6">
+                <Shield className="h-8 w-8 text-primary" />
               </div>
-              <h3 className="font-serif text-2xl mb-4">Premium Quality</h3>
+              <h3 className="text-2xl font-bold mb-4">Quality Assured</h3>
               <p className="text-muted-foreground leading-relaxed">
-                Every product is carefully vetted to ensure it meets our exacting standards for craftsmanship and
-                durability.
+                All products meet our rigorous quality standards and come with comprehensive warranties.
               </p>
             </div>
             <div className="text-center">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-secondary mb-6">
-                <Package className="h-8 w-8" />
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-lg bg-primary/10 mb-6">
+                <TrendingUp className="h-8 w-8 text-primary" />
               </div>
-              <h3 className="font-serif text-2xl mb-4">Curated Selection</h3>
+              <h3 className="text-2xl font-bold mb-4">Best Value</h3>
               <p className="text-muted-foreground leading-relaxed">
-                Our team handpicks each item, focusing on timeless design and functional excellence.
+                Competitive pricing with regular promotions and loyalty rewards for our valued customers.
               </p>
             </div>
             <div className="text-center">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-secondary mb-6">
-                <Truck className="h-8 w-8" />
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-lg bg-primary/10 mb-6">
+                <Truck className="h-8 w-8 text-primary" />
               </div>
-              <h3 className="font-serif text-2xl mb-4">Fast Delivery</h3>
+              <h3 className="text-2xl font-bold mb-4">Fast Shipping</h3>
               <p className="text-muted-foreground leading-relaxed">
-                We partner with trusted carriers to ensure your items arrive quickly and safely at your doorstep.
+                Reliable delivery with real-time tracking and multiple shipping options available.
               </p>
             </div>
           </div>
         </div>
       </section>
 
+      {/* Stats Section */}
+      <section className="py-24 bg-primary text-primary-foreground">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-center">
+            <div>
+              <div className="text-4xl font-bold mb-2">2M+</div>
+              <p className="text-primary-foreground/80">Active Customers</p>
+            </div>
+            <div>
+              <div className="text-4xl font-bold mb-2">50K+</div>
+              <p className="text-primary-foreground/80">Products</p>
+            </div>
+            <div>
+              <div className="text-4xl font-bold mb-2">150+</div>
+              <p className="text-primary-foreground/80">Countries</p>
+            </div>
+            <div>
+              <div className="text-4xl font-bold mb-2">99.8%</div>
+              <p className="text-primary-foreground/80">Satisfaction Rate</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Testimonials Section */}
-      <section className="py-24 bg-secondary">
+      <section className="py-24 bg-background">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="font-serif text-4xl md:text-5xl font-light mb-4">What Our Customers Say</h2>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4">Customer Reviews</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <Card className="p-8 border-0 shadow-none bg-background">
+            <Card className="p-8 border shadow-none">
               <div className="mb-4">
                 <div className="flex gap-1 mb-4">
                   {[...Array(5)].map((_, i) => (
                     <svg
                       key={i}
-                      className="w-5 h-5 fill-current text-foreground"
+                      className="w-5 h-5 fill-current text-primary"
                       viewBox="0 0 20 20"
                       xmlns="http://www.w3.org/2000/svg"
                     >
@@ -214,23 +240,22 @@ export default function HomePage() {
                   ))}
                 </div>
                 <p className="text-muted-foreground leading-relaxed mb-4">
-                  "The quality of products here is unmatched. Every purchase feels like an investment in something truly
-                  special."
+                  "Excellent selection and fast delivery. RetailCorp has become my go-to for all my shopping needs."
                 </p>
               </div>
               <div>
-                <p className="font-medium">Sarah Chen</p>
-                <p className="text-sm text-muted-foreground">Interior Designer</p>
+                <p className="font-semibold">John Smith</p>
+                <p className="text-sm text-muted-foreground">Verified Customer</p>
               </div>
             </Card>
 
-            <Card className="p-8 border-0 shadow-none bg-background">
+            <Card className="p-8 border shadow-none">
               <div className="mb-4">
                 <div className="flex gap-1 mb-4">
                   {[...Array(5)].map((_, i) => (
                     <svg
                       key={i}
-                      className="w-5 h-5 fill-current text-foreground"
+                      className="w-5 h-5 fill-current text-primary"
                       viewBox="0 0 20 20"
                       xmlns="http://www.w3.org/2000/svg"
                     >
@@ -239,22 +264,22 @@ export default function HomePage() {
                   ))}
                 </div>
                 <p className="text-muted-foreground leading-relaxed mb-4">
-                  "I appreciate the curation and attention to detail. It's clear that every item is chosen with care."
+                  "Great customer service and competitive prices. Highly recommend RetailCorp to anyone."
                 </p>
               </div>
               <div>
-                <p className="font-medium">Michael Torres</p>
-                <p className="text-sm text-muted-foreground">Architect</p>
+                <p className="font-semibold">Maria Garcia</p>
+                <p className="text-sm text-muted-foreground">Verified Customer</p>
               </div>
             </Card>
 
-            <Card className="p-8 border-0 shadow-none bg-background">
+            <Card className="p-8 border shadow-none">
               <div className="mb-4">
                 <div className="flex gap-1 mb-4">
                   {[...Array(5)].map((_, i) => (
                     <svg
                       key={i}
-                      className="w-5 h-5 fill-current text-foreground"
+                      className="w-5 h-5 fill-current text-primary"
                       viewBox="0 0 20 20"
                       xmlns="http://www.w3.org/2000/svg"
                     >
@@ -263,13 +288,12 @@ export default function HomePage() {
                   ))}
                 </div>
                 <p className="text-muted-foreground leading-relaxed mb-4">
-                  "Fast shipping, beautiful packaging, and products that exceed expectations. This is my go-to for
-                  gifts."
+                  "Wide variety of products at great prices. The website is easy to navigate and checkout is seamless."
                 </p>
               </div>
               <div>
-                <p className="font-medium">Emma Williams</p>
-                <p className="text-sm text-muted-foreground">Creative Director</p>
+                <p className="font-semibold">David Chen</p>
+                <p className="text-sm text-muted-foreground">Verified Customer</p>
               </div>
             </Card>
           </div>
@@ -277,16 +301,14 @@ export default function HomePage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-24 bg-background">
+      <section className="py-24 bg-secondary">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="font-serif text-4xl md:text-5xl font-light mb-6 text-balance">
-            Join our community of discerning customers
-          </h2>
+          <h2 className="text-4xl md:text-5xl font-bold mb-6 text-balance">Join Millions of Satisfied Customers</h2>
           <p className="text-muted-foreground max-w-2xl mx-auto mb-8 leading-relaxed">
-            Be the first to discover new arrivals and exclusive offers.
+            Create an account today and enjoy exclusive deals, faster checkout, and personalized recommendations.
           </p>
-          <Button asChild size="lg">
-            <Link href="/login">Create Account</Link>
+          <Button asChild size="lg" className="text-base">
+            <Link href="/login">Get Started</Link>
           </Button>
         </div>
       </section>

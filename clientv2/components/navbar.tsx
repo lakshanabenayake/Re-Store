@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { Search, ShoppingCart, User, Menu ,Sun, Moon } from "lucide-react"
+import { Search, ShoppingCart, User, Menu, Sun, Moon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
@@ -29,21 +29,23 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
-          <div className="text-xl font-serif font-semibold tracking-tight">LUXE</div>
+          <div className="w-8 h-8 bg-primary rounded-md flex items-center justify-center">
+            <span className="text-white font-bold text-sm">RC</span>
+          </div>
+          <span className="font-semibold text-foreground hidden sm:inline">ReStore-Corp</span>
         </Link>
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-8">
-          <Link href="/catalog" className="text-sm font-medium hover:text-muted-foreground transition-colors">
-            Shop
+          <Link href="/catalog" className="text-sm font-medium text-foreground hover:text-primary transition-colors">
+            Products
           </Link>
-          <Link href="/about" className="text-sm font-medium hover:text-muted-foreground transition-colors">
+          <Link href="/about" className="text-sm font-medium text-foreground hover:text-primary transition-colors">
             About
           </Link>
-          <Link href="/seller" className="text-sm font-medium hover:text-muted-foreground transition-colors">
-            Sell
+          <Link href="/seller" className="text-sm font-medium text-foreground hover:text-primary transition-colors">
+            Sellers
           </Link>
         </nav>
 
@@ -57,24 +59,22 @@ export function Navbar() {
 
         {/* Actions */}
         <div className="flex items-center gap-4">
-          
           <Button variant="ghost" size="icon" className="hidden md:flex">
             <Search className="h-5 w-5 md:hidden" />
           </Button>
 
-            {/* Theme Toggle Button */}
-            <Button 
-              variant="ghost" 
-              size="icon"
-              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            >
-              {theme === "dark" ? (
-                <Sun className="h-5 w-5" />
-              ) : (
-                <Moon className="h-5 w-5" />
-              )}
-            </Button>
-        
+          {/* Theme Toggle Button */}
+          <Button 
+            variant="ghost" 
+            size="icon"
+            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+          >
+            {theme === "dark" ? (
+              <Sun className="h-5 w-5" />
+            ) : (
+              <Moon className="h-5 w-5" />
+            )}
+          </Button>
 
           <Link href="/login">
             <Button variant="ghost" size="icon">
@@ -127,13 +127,13 @@ export function Navbar() {
                 </Button>
 
                 <Link href="/catalog" className="text-lg font-medium">
-                  Shop
+                  Products
                 </Link>
                 <Link href="/about" className="text-lg font-medium">
                   About
                 </Link>
                 <Link href="/seller" className="text-lg font-medium">
-                  Sell
+                  Sellers
                 </Link>
                 <Link href="/admin" className="text-lg font-medium">
                   Admin
