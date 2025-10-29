@@ -1,7 +1,8 @@
-import NavBar from "./NavBar";
+import Navbar from "./NavBar";
 import { Box, Container, createTheme, CssBaseline, ThemeProvider } from "@mui/material";
 import { Outlet } from "react-router-dom";
 import { useAppSelector } from "../store/store";
+import { useEffect } from "react";
 
 function App() {
   const {darkMode} = useAppSelector(state => state.ui);
@@ -26,12 +27,20 @@ function App() {
   },
   })
 
+  // Sync darkMode with HTML class for shadcn/ui
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [darkMode]);
 
   return (
 <>
 <ThemeProvider theme={theme}>
   <CssBaseline />
-  <NavBar />
+  <Navbar />
   <Box sx={{
     minHeight: '100vh',
     background: darkMode ? '#121212':'#eaeaea'
