@@ -32,6 +32,9 @@ export const accountApi = createApi({
       providesTags: ['User'],
       transformResponse: (response: any) => {
         console.log('User API Response:', response);
+        if (!response || response.status === 401) {
+          return null;
+        }
         const user = {
           email: response.email || response.Email,
           userName: response.userName || response.UserName,
@@ -57,6 +60,21 @@ export const accountApi = createApi({
         method: 'POST',
       }),
       invalidatesTags: ['User'],
+      // Immediately clear user data from cache
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
+        // Optimistically clear the user data immediately
+        const patchResult = dispatch(
+          accountApi.util.updateQueryData('fetchCurrentUser', undefined, () => null)
+        );
+        
+        try {
+          await queryFulfilled;
+          // If successful, the cache is already cleared
+        } catch {
+          // If the mutation fails, undo the optimistic update
+          patchResult.undo();
+        }
+      },
     }),
   }),
 });

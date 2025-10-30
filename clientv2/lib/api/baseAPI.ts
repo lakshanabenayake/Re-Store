@@ -30,6 +30,12 @@ export const baseQueryWithErrorHandling = async (
         : result.error.status;
 
     const responseData = result.error.data as ErrorResponse;
+    
+    // Get the URL from args to check which endpoint is being called
+    const url = typeof args === 'string' ? args : args.url;
+    
+    // Don't show toast for 401 on user-info endpoint (it's expected when not logged in)
+    const isUserInfoEndpoint = url.includes('account/user-info');
 
     switch (originalStatus) {
       case 400:
@@ -39,8 +45,10 @@ export const baseQueryWithErrorHandling = async (
         } else toast.error(responseData.title);
         break;
       case 401:
-        if (typeof responseData === 'object' && 'title' in responseData)
+        // Don't show unauthorized toast for user-info endpoint
+        if (!isUserInfoEndpoint && typeof responseData === 'object' && 'title' in responseData) {
           toast.error(responseData.title);
+        }
         break;
       case 404:
         if (typeof responseData === 'object' && 'title' in responseData) {

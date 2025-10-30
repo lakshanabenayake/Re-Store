@@ -16,19 +16,21 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { useFetchBasketQuery } from "@/lib/api/basketApi"
-import { useFetchCurrentUserQuery, useLogoutMutation } from "@/lib/api/accountApi"
+import { useFetchCurrentUserQuery, useLogoutMutation, accountApi } from "@/lib/api/accountApi"
 import { useTheme } from "next-themes"
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
+import { useDispatch } from "react-redux"
 
 export function Navbar() {
   const router = useRouter()
+  const dispatch = useDispatch()
   const { theme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
 
   const {data: basket} = useFetchBasketQuery();
   const { data: user, isLoading: isLoadingUser, error: userError } = useFetchCurrentUserQuery();
-  const [logout] = useLogoutMutation();
+  const [logout, { isLoading: isLoggingOut }] = useLogoutMutation();
   const itemCount = basket?.items.reduce((sum, item) => sum + item.quantity, 0) || 0;
 
   console.log('Navbar - User data:', user);
@@ -38,9 +40,13 @@ export function Navbar() {
   const handleLogout = async () => {
     try {
       await logout().unwrap();
+      // Manually reset the accountApi cache
+      dispatch(accountApi.util.resetApiState());
       toast.success("Logged out successfully");
+      // Redirect to home page after logout
       router.push("/");
     } catch (error) {
+      console.error("Logout error:", error);
       toast.error("Logout failed");
     }
   };
@@ -102,7 +108,7 @@ export function Navbar() {
           </Button>
 
           {/* User Menu */}
-          {user ? (
+          {user && !isLoadingUser ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon">
@@ -120,23 +126,23 @@ export function Navbar() {
                 </DropdownMenuItem>
                 {user.roles?.includes("Admin") && (
                   <DropdownMenuItem asChild>
-                    <Link href="/admin">Admin Panel</Link>
+                    <Link href="/admin/products">Admin Panel</Link>
                   </DropdownMenuItem>
                 )}
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout}>
+                <DropdownMenuItem onClick={handleLogout} disabled={isLoggingOut}>
                   <LogOut className="h-4 w-4 mr-2" />
-                  Logout
+                  {isLoggingOut ? "Logging out..." : "Logout"}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-          ) : (
+          ) : !isLoadingUser ? (
             <Link href="/login">
               <Button variant="ghost" size="icon">
                 <User className="h-5 w-5" />
               </Button>
             </Link>
-          )}
+          ) : null}
 
           <Link href="/cart" className="relative">
             <Button variant="ghost" size="icon">
