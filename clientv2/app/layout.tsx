@@ -5,6 +5,7 @@ import { Analytics } from "@vercel/analytics/next"
 import "./globals.css"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
+import Chatbot from "@/components/Chatbot"
 import StoreProvider from "@/lib/store/StoreProvider"
 import { Toaster } from "sonner"
 import { ThemeProvider } from "@/components/theme-provider"
@@ -40,6 +41,7 @@ export default function RootLayout({
             <Navbar />
             <main className="min-h-screen">{children}</main>
             <Footer />
+            <Chatbot />
             <Analytics />
             <Toaster position="bottom-right" richColors />
           </StoreProvider>

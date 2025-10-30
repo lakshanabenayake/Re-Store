@@ -6,6 +6,7 @@ import { catalogApi } from "../api/catalogApi";
 import { basketApi } from "../api/basketApi";
 import { accountApi } from "../api/accountApi";
 import { searchApi } from "../api/searchApi";
+import { chatApi } from "../api/chatApi";
 
 export const makeStore = () => {
   return configureStore({
@@ -14,6 +15,7 @@ export const makeStore = () => {
       [basketApi.reducerPath]: basketApi.reducer,
       [accountApi.reducerPath]: accountApi.reducer,
       [searchApi.reducerPath]: searchApi.reducer,
+      [chatApi.reducerPath]: chatApi.reducer,
       ui: uiSlice,
       user: userSlice,
     },
@@ -22,7 +24,8 @@ export const makeStore = () => {
         catalogApi.middleware,
         basketApi.middleware,
         accountApi.middleware,
-        searchApi.middleware
+        searchApi.middleware,
+        chatApi.middleware
       ),
   });
 };
