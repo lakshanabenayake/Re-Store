@@ -1,18 +1,26 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { useDispatch, useSelector } from "react-redux";
 import uiSlice from "./slices/uiSlice";
+import userSlice from "./slices/userSlice";
 import { catalogApi } from "../api/catalogApi";
 import { basketApi } from "../api/basketApi";
+import { accountApi } from "../api/accountApi";
 
 export const makeStore = () => {
   return configureStore({
     reducer: {
       [catalogApi.reducerPath]: catalogApi.reducer,
       [basketApi.reducerPath]: basketApi.reducer,
+      [accountApi.reducerPath]: accountApi.reducer,
       ui: uiSlice,
+      user: userSlice,
     },
     middleware: (getDefaultMiddleware) =>
-      getDefaultMiddleware().concat(catalogApi.middleware, basketApi.middleware),
+      getDefaultMiddleware().concat(
+        catalogApi.middleware,
+        basketApi.middleware,
+        accountApi.middleware
+      ),
   });
 };
 

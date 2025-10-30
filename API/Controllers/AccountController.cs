@@ -13,7 +13,7 @@ public class AccountController(SignInManager<User> signInManager) : BaseApiContr
     [HttpPost("register")]
     public async Task<ActionResult> RegisterUser(RegisterDto registerDto)
     {
-        var user = new User{UserName = registerDto.Email, Email = registerDto.Email};
+        var user = new User { UserName = registerDto.Email, Email = registerDto.Email };
 
         var result = await signInManager.UserManager.CreateAsync(user, registerDto.Password);
 
@@ -32,18 +32,46 @@ public class AccountController(SignInManager<User> signInManager) : BaseApiContr
         return Ok();
     }
 
-    [HttpGet("user-info")]
-    public async Task<ActionResult> GetUserInfo()
+    [HttpPost("login")]
+    public async Task<ActionResult> Login(RegisterDto loginDto)
     {
-        if (User.Identity?.IsAuthenticated == false) return NoContent();
-
-        var user = await signInManager.UserManager.GetUserAsync(User);
+        var user = await signInManager.UserManager.FindByEmailAsync(loginDto.Email);
 
         if (user == null) return Unauthorized();
 
-        var roles = await signInManager.UserManager.GetRolesAsync(user);
+        var result = await signInManager.PasswordSignInAsync(user, loginDto.Password, isPersistent: true, lockoutOnFailure: false);
 
-        return Ok(new 
+        if (!result.Succeeded) return Unauthorized();
+
+        return Ok();
+    }
+
+    [HttpGet("user-info")]
+    public async Task<ActionResult> GetUserInfo()
+    {
+        Console.WriteLine($"IsAuthenticated: {User.Identity?.IsAuthenticated}");
+        Console.WriteLine($"User.Identity.Name: {User.Identity?.Name}");
+        Console.WriteLine($"AuthenticationType: {User.Identity?.AuthenticationType}");
+
+        if (!User.Identity?.IsAuthenticated ?? true)
+        {
+            Console.WriteLine("User is not authenticated");
+            return Unauthorized();
+        }
+
+        var user = await signInManager.UserManager.Users
+            .FirstOrDefaultAsync(x => x.UserName == User.Identity!.Name);
+
+        if (user == null)
+        {
+            Console.WriteLine($"User not found for username: {User.Identity?.Name}");
+            return Unauthorized();
+        }
+
+        var roles = await signInManager.UserManager.GetRolesAsync(user);
+        Console.WriteLine($"User roles: {string.Join(", ", roles)}");
+
+        return Ok(new
         {
             user.Email,
             user.UserName,

@@ -4,64 +4,63 @@ import type React from "react"
 
 import { useState } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { useRegisterMutation } from "@/lib/api/accountApi"
+import { toast } from "sonner"
 
 export default function SignupPage() {
+  const router = useRouter()
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
     email: "",
     password: "",
     confirmPassword: "",
-    role: "customer"
   })
+  const [register, { isLoading }] = useRegisterMutation()
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Handle signup logic here
-    console.log("Signup:", formData)
+    
+    // Validate passwords match
+    if (formData.password !== formData.confirmPassword) {
+      toast.error("Passwords do not match!")
+      return
+    }
+
+    // Validate password length
+    if (formData.password.length < 6) {
+      toast.error("Password must be at least 6 characters long!")
+      return
+    }
+    
+    try {
+      await register({
+        email: formData.email,
+        password: formData.password,
+      }).unwrap()
+      
+      toast.success("Registration successful! Please login.")
+      router.push("/login")
+    } catch (error: any) {
+      const errorMessage = error?.data?.title || "Registration failed. Please try again."
+      toast.error(errorMessage)
+    }
   }
 
   return (
     <div className="container mx-auto px-4 py-24">
       <div className="max-w-md mx-auto">
         <div className="text-center mb-8">
-          <h1 className="font-serif text-4xl font-light mb-2">Create Account</h1>
-          <p className="text-muted-foreground">Join our community of discerning customers</p>
+          <h1 className="text-4xl font-bold mb-2">Create Account</h1>
+          <p className="text-muted-foreground">Join millions of satisfied customers</p>
         </div>
 
         <Card className="p-8 border-0 shadow-sm">
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="firstName">First Name</Label>
-                <Input
-                  id="firstName"
-                  placeholder="John"
-                  value={formData.firstName}
-                  onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                  required
-                  className="mt-1.5"
-                />
-              </div>
-              <div>
-                <Label htmlFor="lastName">Last Name</Label>
-                <Input
-                  id="lastName"
-                  placeholder="Doe"
-                  value={formData.lastName}
-                  onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                  required
-                  className="mt-1.5"
-                />
-              </div>
-            </div>
-
             <div>
               <Label htmlFor="email">Email</Label>
               <Input
@@ -86,7 +85,9 @@ export default function SignupPage() {
                 required
                 className="mt-1.5"
               />
-              <p className="text-xs text-muted-foreground mt-1">Must be at least 8 characters</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                Must be at least 6 characters and contain uppercase, lowercase, and digit
+              </p>
             </div>
 
             <div>
@@ -116,8 +117,8 @@ export default function SignupPage() {
               </Label>
             </div>
 
-            <Button type="submit" size="lg" className="w-full">
-              Create Account
+            <Button type="submit" size="lg" className="w-full" disabled={isLoading}>
+              {isLoading ? "Creating Account..." : "Create Account"}
             </Button>
           </form>
 

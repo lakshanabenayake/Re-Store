@@ -1,21 +1,49 @@
 "use client"
 
 import Link from "next/link"
-import { Search, ShoppingCart, User, Menu, Sun, Moon } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { Search, ShoppingCart, User, Menu, Sun, Moon, LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Badge } from "@/components/ui/badge"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { useFetchBasketQuery } from "@/lib/api/basketApi"
+import { useFetchCurrentUserQuery, useLogoutMutation } from "@/lib/api/accountApi"
 import { useTheme } from "next-themes"
 import { useEffect, useState } from "react"
+import { toast } from "sonner"
 
 export function Navbar() {
+  const router = useRouter()
   const { theme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
 
   const {data: basket} = useFetchBasketQuery();
+  const { data: user, isLoading: isLoadingUser, error: userError } = useFetchCurrentUserQuery();
+  const [logout] = useLogoutMutation();
   const itemCount = basket?.items.reduce((sum, item) => sum + item.quantity, 0) || 0;
+
+  console.log('Navbar - User data:', user);
+  console.log('Navbar - Is loading user:', isLoadingUser);
+  console.log('Navbar - User error:', userError);
+
+  const handleLogout = async () => {
+    try {
+      await logout().unwrap();
+      toast.success("Logged out successfully");
+      router.push("/");
+    } catch (error) {
+      toast.error("Logout failed");
+    }
+  };
 
   // useEffect only runs on the client, so now we can safely show the UI
   useEffect(() => {
@@ -73,11 +101,42 @@ export function Navbar() {
             )}
           </Button>
 
-          <Link href="/login">
-            <Button variant="ghost" size="icon">
-              <User className="h-5 w-5" />
-            </Button>
-          </Link>
+          {/* User Menu */}
+          {user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <User className="h-5 w-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>{user.email}</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link href="/orders">My Orders</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/account">Account Settings</Link>
+                </DropdownMenuItem>
+                {user.roles?.includes("Admin") && (
+                  <DropdownMenuItem asChild>
+                    <Link href="/admin">Admin Panel</Link>
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleLogout}>
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Link href="/login">
+              <Button variant="ghost" size="icon">
+                <User className="h-5 w-5" />
+              </Button>
+            </Link>
+          )}
 
           <Link href="/cart" className="relative">
             <Button variant="ghost" size="icon">

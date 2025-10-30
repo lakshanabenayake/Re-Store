@@ -13,13 +13,18 @@ import { Product } from "@/lib/models/product"
 import { useSearchParams } from "next/navigation"
 
 export default function CatalogPage() {
-  const { data: products, isLoading, error } = useFetchProductsQuery()
+  const { data: productsResponse, isLoading, error } = useFetchProductsQuery({ 
+    pageSize: 50 // Fetch more products for catalog
+  })
   const searchParams = useSearchParams()
   const typeParam = searchParams.get('category')
   
   const [selectedCategories, setSelectedCategories] = useState<string[]>([])
   const [priceRange, setPriceRange] = useState([0, 50000]) // Price in cents
   const [sortBy, setSortBy] = useState("featured")
+
+  // Extract products from response
+  const products = productsResponse?.items || []
 
   // Get unique categories from products
   const categories = products
@@ -104,13 +109,13 @@ export default function CatalogPage() {
   return (
     <div className="container mx-auto px-4 py-12">
       <div className="mb-8">
-        <h1 className="font-medium text-4xl md:text-5xl font-light mb-4">Shop All Products</h1>
+        <h1 className="text-4xl md:text-5xl font-light mb-4">Shop All Products</h1>
         <p className="text-muted-foreground">Discover our complete collection of curated premium products.</p>
       </div>
 
       <div className="flex flex-col lg:flex-row gap-8">
         {/* Filters Sidebar */}
-        <aside className="lg:w-64 flex-shrink-0">
+        <aside className="lg:w-64 shrink-0">
           <div className="sticky top-20 space-y-8">
             {/* Category Filter */}
             <div>
@@ -186,7 +191,19 @@ export default function CatalogPage() {
 
           {/* Products Grid */}
           {filteredProducts.length > 0 ? (
-            <ProductList products={filteredProducts} />
+            <>
+              <ProductList products={filteredProducts} />
+              {productsResponse?.metadata && (
+                <div className="mt-8 text-center text-sm text-muted-foreground">
+                  Showing {products.length} of {productsResponse.metadata.totalCount} total products
+                  {productsResponse.metadata.totalPages > 1 && (
+                    <p className="mt-2">
+                      Note: Viewing page {productsResponse.metadata.currentPage} of {productsResponse.metadata.totalPages}
+                    </p>
+                  )}
+                </div>
+              )}
+            </>
           ) : (
             <div className="text-center py-12">
               <p className="text-muted-foreground mb-4">No products found matching your filters.</p>

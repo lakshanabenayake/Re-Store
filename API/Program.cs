@@ -1,6 +1,8 @@
 using API.Data;
+using API.Entities;
 using API.RequestHelpers;
 using API.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using DotNetEnv;
 
@@ -26,6 +28,35 @@ builder.Services.AddDbContext<StoreContext>(opt =>
 {
     opt.UseSqlServer(connectionString);
 });
+
+// Configure Identity
+builder.Services.AddIdentityCore<User>(opt =>
+{
+    opt.User.RequireUniqueEmail = true;
+    opt.Password.RequireDigit = true;
+    opt.Password.RequireLowercase = true;
+    opt.Password.RequireUppercase = true;
+    opt.Password.RequireNonAlphanumeric = false;
+    opt.Password.RequiredLength = 6;
+})
+.AddRoles<IdentityRole>()
+.AddEntityFrameworkStores<StoreContext>()
+.AddSignInManager<SignInManager<User>>();
+
+builder.Services.AddAuthentication(IdentityConstants.ApplicationScheme)
+    .AddIdentityCookies(options =>
+    {
+        options.ApplicationCookie?.Configure(opt =>
+        {
+            opt.Cookie.HttpOnly = true;
+            opt.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+            opt.Cookie.SameSite = SameSiteMode.None;
+            opt.Cookie.Path = "/";
+            opt.ExpireTimeSpan = TimeSpan.FromDays(7);
+            opt.SlidingExpiration = true;
+        });
+    });
+builder.Services.AddAuthorization();
 
 // Configure Cloudinary settings from environment variables
 builder.Services.Configure<CloudinarySettings>(options =>
@@ -69,7 +100,8 @@ app.UseCors(opt =>
 
 // app.UseHttpsRedirection();
 
-// app.UseAuthorization();
+app.UseAuthentication();
+app.UseAuthorization();
 
 
 app.MapControllers();

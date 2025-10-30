@@ -1,27 +1,60 @@
 using System;
 using API.Entities;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Data
 {
     public class DbInitializer
     {
-        public static void InitDb(WebApplication app)
+        public static async void InitDb(WebApplication app)
         {
             using var scope = app.Services.CreateScope();
 
             var context = scope.ServiceProvider.GetRequiredService<StoreContext>()
             ?? throw new InvalidOperationException("Failed to retrieve store context");
 
-            SeedData(context);
+            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+            var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+            await SeedData(context, userManager, roleManager);
 
         }
 
-        private static void SeedData(StoreContext context)
+        private static async Task SeedData(StoreContext context, UserManager<User> userManager, RoleManager<IdentityRole> roleManager)
         {
             // Drop and recreate the database (use only in development)
             context.Database.EnsureDeleted();
             context.Database.Migrate();
+
+            // Seed Roles
+            if (!await roleManager.RoleExistsAsync("Member"))
+            {
+                await roleManager.CreateAsync(new IdentityRole("Member"));
+            }
+
+            if (!await roleManager.RoleExistsAsync("Admin"))
+            {
+                await roleManager.CreateAsync(new IdentityRole("Admin"));
+            }
+
+            // Seed Admin User
+            if (await userManager.FindByEmailAsync("admin@test.com") == null)
+            {
+                var adminUser = new User
+                {
+                    UserName = "admin@test.com",
+                    Email = "admin@test.com"
+                };
+
+                var result = await userManager.CreateAsync(adminUser, "Admin123!");
+
+                if (result.Succeeded)
+                {
+                    await userManager.AddToRoleAsync(adminUser, "Admin");
+                }
+            }
+
             if (context.Products.Any()) return;
 
             var Products = new List<Product>

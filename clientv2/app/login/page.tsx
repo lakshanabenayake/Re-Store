@@ -4,20 +4,34 @@ import type React from "react"
 
 import { useState } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
+import { useLoginMutation, useFetchCurrentUserQuery } from "@/lib/api/accountApi"
+import { toast } from "sonner"
 
 export default function LoginPage() {
+  const router = useRouter()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [login, { isLoading }] = useLoginMutation()
+  const { refetch } = useFetchCurrentUserQuery()
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Handle login logic here
-    console.log("Login:", { email, password })
+    
+    try {
+      await login({ email, password }).unwrap()
+      // Refetch user data after successful login
+      await refetch()
+      toast.success("Login successful!")
+      router.push("/")
+    } catch (error: any) {
+      toast.error(error?.data?.title || "Login failed. Please check your credentials.")
+    }
   }
 
   return (
@@ -68,8 +82,8 @@ export default function LoginPage() {
               </Link>
             </div>
 
-            <Button type="submit" size="lg" className="w-full">
-              Sign In
+            <Button type="submit" size="lg" className="w-full" disabled={isLoading}>
+              {isLoading ? "Signing In..." : "Sign In"}
             </Button>
           </form>
 
