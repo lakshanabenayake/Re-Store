@@ -30,7 +30,7 @@ namespace API.Services
         {
             _logger.LogInformation("Generating embedding with Gemini for text: {Text}",
               text.Length > 50 ? text.Substring(0, 50) + "..." : text);
-                
+
             var requestBody = new
             {
                 model = MODEL,
@@ -69,7 +69,11 @@ namespace API.Services
 
             return embedding;
         }
-    
+
+        public async Task<float[]> GenerateEmbeddingAsync(string text)
+        {
+            // This method is just an alias for GenerateEmbeddingsAsync
+            return await GenerateEmbeddingsAsync(text);
+        }
     }
-        
 }

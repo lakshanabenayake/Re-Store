@@ -11,4 +11,9 @@ public class Product
     public required string Brand { get; set; }
     public int QuantityInStock { get; set; }
     public string? PublicId { get; set; }
+
+    // Additional properties for semantic search
+    public string Category => Type; // Using Type as Category for backward compatibility
+    public string ImageUrl => PictureUrl; // Using PictureUrl as ImageUrl for backward compatibility
+    public List<string> Tags => new List<string> { Brand, Type }; // Generate tags from existing fields
 }

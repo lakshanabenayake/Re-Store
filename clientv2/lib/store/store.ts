@@ -5,6 +5,7 @@ import userSlice from "./slices/userSlice";
 import { catalogApi } from "../api/catalogApi";
 import { basketApi } from "../api/basketApi";
 import { accountApi } from "../api/accountApi";
+import { searchApi } from "../api/searchApi";
 
 export const makeStore = () => {
   return configureStore({
@@ -12,6 +13,7 @@ export const makeStore = () => {
       [catalogApi.reducerPath]: catalogApi.reducer,
       [basketApi.reducerPath]: basketApi.reducer,
       [accountApi.reducerPath]: accountApi.reducer,
+      [searchApi.reducerPath]: searchApi.reducer,
       ui: uiSlice,
       user: userSlice,
     },
@@ -19,7 +21,8 @@ export const makeStore = () => {
       getDefaultMiddleware().concat(
         catalogApi.middleware,
         basketApi.middleware,
-        accountApi.middleware
+        accountApi.middleware,
+        searchApi.middleware
       ),
   });
 };

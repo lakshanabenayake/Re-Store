@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace API.Controllers
 {
-    public class ProductsController(StoreContext context, IMapper mapper, 
-        ImageService imageService) : BaseApiController
+    public class ProductsController(StoreContext context, IMapper mapper,
+        ImageService imageService, PineconeService pineconeService) : BaseApiController
     {
         [HttpGet]
         public async Task<ActionResult<List<Product>>> GetProducts(
@@ -51,6 +51,61 @@ namespace API.Controllers
             return Ok(new { brands, types });
         }
 
+        [HttpGet("search")]
+        public async Task<ActionResult<List<SearchResult>>> SemanticSearch(
+            [FromQuery] string query,
+            [FromQuery] int topK = 10)
+        {
+            if (string.IsNullOrWhiteSpace(query))
+            {
+                return BadRequest("Search query cannot be empty");
+            }
+
+            try
+            {
+                var results = await pineconeService.SearchProductsAsync(query, topK);
+                return Ok(results);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error performing semantic search: {ex.Message}");
+            }
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost("index")]
+        public async Task<IActionResult> IndexProducts()
+        {
+            try
+            {
+                var products = await context.Products.ToListAsync();
+                await pineconeService.UpsertProductsAsync(products);
+                return Ok(new { message = $"Successfully indexed {products.Count} products" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error indexing products: {ex.Message}");
+            }
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost("index/{id}")]
+        public async Task<IActionResult> IndexProduct(int id)
+        {
+            var product = await context.Products.FindAsync(id);
+            if (product == null) return NotFound();
+
+            try
+            {
+                await pineconeService.UpsertProductAsync(product);
+                return Ok(new { message = $"Successfully indexed product {id}" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error indexing product: {ex.Message}");
+            }
+        }
+
         [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<Product>> CreateProduct(CreateProductDto productDto)
@@ -74,7 +129,21 @@ namespace API.Controllers
 
             var result = await context.SaveChangesAsync() > 0;
 
-            if (result) return CreatedAtAction(nameof(GetProduct), new { Id = product.Id }, product);
+            if (result)
+            {
+                // Index the product in Pinecone
+                try
+                {
+                    await pineconeService.UpsertProductAsync(product);
+                }
+                catch (Exception ex)
+                {
+                    // Log the error but don't fail the product creation
+                    Console.WriteLine($"Error indexing product in Pinecone: {ex.Message}");
+                }
+
+                return CreatedAtAction(nameof(GetProduct), new { Id = product.Id }, product);
+            }
 
             return BadRequest("Problem creating new procuct");
         }
@@ -89,7 +158,7 @@ namespace API.Controllers
 
             mapper.Map(updateProductDto, product);
 
-            if (updateProductDto.File != null) 
+            if (updateProductDto.File != null)
             {
                 var imageResult = await imageService.AddImageAsync(updateProductDto.File);
 
@@ -105,7 +174,21 @@ namespace API.Controllers
 
             var result = await context.SaveChangesAsync() > 0;
 
-            if (result) return NoContent();
+            if (result)
+            {
+                // Re-index the product in Pinecone
+                try
+                {
+                    await pineconeService.UpsertProductAsync(product);
+                }
+                catch (Exception ex)
+                {
+                    // Log the error but don't fail the product update
+                    Console.WriteLine($"Error re-indexing product in Pinecone: {ex.Message}");
+                }
+
+                return NoContent();
+            }
 
             return BadRequest("Problem updating product");
         }
@@ -119,7 +202,7 @@ namespace API.Controllers
             if (product == null) return NotFound();
 
             if (!string.IsNullOrEmpty(product.PublicId))
-                    await imageService.DeleteImageAsync(product.PublicId);
+                await imageService.DeleteImageAsync(product.PublicId);
 
             context.Products.Remove(product);
 

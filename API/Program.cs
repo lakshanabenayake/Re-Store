@@ -70,6 +70,8 @@ builder.Services.Configure<CloudinarySettings>(options =>
 builder.Services.AddScoped<ImageService>();
 builder.Services.AddScoped<PaymentsService>();
 builder.Services.AddScoped<DiscountService>();
+builder.Services.AddSingleton<API.Interfaces.IEmbeddingService, API.Services.GeminiEmbeddingService>();
+builder.Services.AddScoped<API.Services.PineconeService>();
 
 builder.Services.AddCors();
 builder.Services.AddTransient<API.Middleware.ExceptionMiddleware>();
