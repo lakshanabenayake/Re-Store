@@ -34,89 +34,89 @@ namespace API.Services
         }
 
         public async Task<string> ChatAsync(string userMessage, string? userEmail = null, List<object>? conversationHistory = null)
-{
-    _logger.LogInformation("Processing chat message: {Message}", userMessage);
-
-    try
-    {
-        // Build context based on the user's message
-        var contextInfo = await BuildContextAsync(userMessage, userEmail);
-
-        // Build the system instruction
-        var systemInstruction = BuildSystemInstruction(contextInfo);
-
-        // Build conversation history
-        var contents = new List<object>();
-
-        // Add previous conversation history if exists
-        if (conversationHistory != null && conversationHistory.Any())
         {
-            contents.AddRange(conversationHistory);
-        }
+            _logger.LogInformation("Processing chat message: {Message}", userMessage);
 
-        // Add current user message
-        contents.Add(new
-        {
-            role = "user",
-            parts = new[]
+            try
             {
+                // Build context based on the user's message
+                var contextInfo = await BuildContextAsync(userMessage, userEmail);
+
+                // Build the system instruction
+                var systemInstruction = BuildSystemInstruction(contextInfo);
+
+                // Build conversation history
+                var contents = new List<object>();
+
+                // Add previous conversation history if exists
+                if (conversationHistory != null && conversationHistory.Any())
+                {
+                    contents.AddRange(conversationHistory);
+                }
+
+                // Add current user message
+                contents.Add(new
+                {
+                    role = "user",
+                    parts = new[]
+                    {
                 new { text = userMessage }
             }
-        });
+                });
 
-        var requestBody = new
-        {
-            systemInstruction = new  // Changed from system_instruction
-            {
-                parts = new[]
+                var requestBody = new
                 {
+                    systemInstruction = new  // Changed from system_instruction
+                    {
+                        parts = new[]
+                        {
                     new { text = systemInstruction }
                 }
-            },
-            contents = contents,
-            generationConfig = new
-            {
-                temperature = 0.7,
-                topK = 40,
-                topP = 0.95,
-                maxOutputTokens = 1024,
+                    },
+                    contents = contents,
+                    generationConfig = new
+                    {
+                        temperature = 0.7,
+                        topK = 40,
+                        topP = 0.95,
+                        maxOutputTokens = 1024,
+                    }
+                };
+
+                var jsonContent = JsonSerializer.Serialize(requestBody, new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase  // This will convert to camelCase
+                });
+                var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+                var url = $"v1/models/{MODEL}:generateContent?key={_apiKey}";
+                var response = await _httpClient.PostAsync(url, content);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var error = await response.Content.ReadAsStringAsync();
+                    _logger.LogError("Gemini API error: {StatusCode} - {Error}", response.StatusCode, error);
+                    return "I apologize, but I'm having trouble connecting to my AI service right now. Please try again in a moment.";
+                }
+
+                var responseJson = await response.Content.ReadAsStringAsync();
+                using var doc = JsonDocument.Parse(responseJson);
+
+                var text = doc.RootElement
+                    .GetProperty("candidates")[0]
+                    .GetProperty("content")
+                    .GetProperty("parts")[0]
+                    .GetProperty("text")
+                    .GetString();
+
+                return text ?? "I'm not sure how to respond to that. Could you please rephrase your question?";
             }
-        };
-
-        var jsonContent = JsonSerializer.Serialize(requestBody, new JsonSerializerOptions 
-        { 
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase  // This will convert to camelCase
-        });
-        var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
-
-        var url = $"v1/models/{MODEL}:generateContent?key={_apiKey}";
-        var response = await _httpClient.PostAsync(url, content);
-
-        if (!response.IsSuccessStatusCode)
-        {
-            var error = await response.Content.ReadAsStringAsync();
-            _logger.LogError("Gemini API error: {StatusCode} - {Error}", response.StatusCode, error);
-            return "I apologize, but I'm having trouble connecting to my AI service right now. Please try again in a moment.";
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in chat service");
+                return "I apologize, but I encountered an error. Please try again.";
+            }
         }
-
-        var responseJson = await response.Content.ReadAsStringAsync();
-        using var doc = JsonDocument.Parse(responseJson);
-
-        var text = doc.RootElement
-            .GetProperty("candidates")[0]
-            .GetProperty("content")
-            .GetProperty("parts")[0]
-            .GetProperty("text")
-            .GetString();
-
-        return text ?? "I'm not sure how to respond to that. Could you please rephrase your question?";
-    }
-    catch (Exception ex)
-    {
-        _logger.LogError(ex, "Error in chat service");
-        return "I apologize, but I encountered an error. Please try again.";
-    }
-}
 
         private async Task<Dictionary<string, object>> BuildContextAsync(string userMessage, string? userEmail)
         {
