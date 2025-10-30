@@ -27,6 +27,7 @@ export function Navbar() {
   const dispatch = useDispatch()
   const { theme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
+  const [searchQuery, setSearchQuery] = useState("")
 
   const {data: basket} = useFetchBasketQuery();
   const { data: user, isLoading: isLoadingUser, error: userError } = useFetchCurrentUserQuery();
@@ -48,6 +49,14 @@ export function Navbar() {
     } catch (error) {
       console.error("Logout error:", error);
       toast.error("Logout failed");
+    }
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
+      setSearchQuery(""); // Clear the search box after navigation
     }
   };
 
@@ -82,10 +91,16 @@ export function Navbar() {
 
         {/* Search Bar - Desktop */}
         <div className="hidden md:flex flex-1 max-w-md mx-8">
-          <div className="relative w-full">
+          <form onSubmit={handleSearch} className="relative w-full">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input type="search" placeholder="Search products..." className="pl-10 bg-secondary border-0" />
-          </div>
+            <Input 
+              type="search" 
+              placeholder="Search products..." 
+              className="pl-10 bg-secondary border-0"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </form>
         </div>
 
         {/* Actions */}
@@ -164,10 +179,16 @@ export function Navbar() {
             </SheetTrigger>
             <SheetContent side="right" className="w-[300px]">
               <nav className="flex flex-col gap-6 mt-8">
-                <div className="relative">
+                <form onSubmit={handleSearch} className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input type="search" placeholder="Search products..." className="pl-10" />
-                </div>
+                  <Input 
+                    type="search" 
+                    placeholder="Search products..." 
+                    className="pl-10"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                </form>
                 
                 {/* Mobile Theme Toggle */}
                 <Button 

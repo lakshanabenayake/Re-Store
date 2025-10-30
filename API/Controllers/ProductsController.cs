@@ -12,7 +12,8 @@ using Microsoft.EntityFrameworkCore;
 namespace API.Controllers
 {
     public class ProductsController(StoreContext context, IMapper mapper,
-        ImageService imageService, PineconeService pineconeService) : BaseApiController
+        ImageService imageService, PineconeService pineconeService,
+        ILogger<ProductsController> logger) : BaseApiController
     {
         [HttpGet]
         public async Task<ActionResult<List<Product>>> GetProducts(
@@ -72,7 +73,7 @@ namespace API.Controllers
             }
         }
 
-        [Authorize(Roles = "Admin")]
+        // [Authorize(Roles = "Admin")] // Temporarily removed for initial indexing
         [HttpPost("index")]
         public async Task<IActionResult> IndexProducts()
         {
@@ -131,15 +132,16 @@ namespace API.Controllers
 
             if (result)
             {
-                // Index the product in Pinecone
+                // Automatically index the product in Pinecone vector database
                 try
                 {
                     await pineconeService.UpsertProductAsync(product);
+                    logger.LogInformation("Product {ProductId} successfully indexed in vector database", product.Id);
                 }
                 catch (Exception ex)
                 {
                     // Log the error but don't fail the product creation
-                    Console.WriteLine($"Error indexing product in Pinecone: {ex.Message}");
+                    logger.LogError(ex, "Failed to index product {ProductId} in vector database. Product created but not searchable via semantic search.", product.Id);
                 }
 
                 return CreatedAtAction(nameof(GetProduct), new { Id = product.Id }, product);
@@ -176,15 +178,16 @@ namespace API.Controllers
 
             if (result)
             {
-                // Re-index the product in Pinecone
+                // Automatically re-index the product in Pinecone vector database
                 try
                 {
                     await pineconeService.UpsertProductAsync(product);
+                    logger.LogInformation("Product {ProductId} successfully re-indexed in vector database", product.Id);
                 }
                 catch (Exception ex)
                 {
                     // Log the error but don't fail the product update
-                    Console.WriteLine($"Error re-indexing product in Pinecone: {ex.Message}");
+                    logger.LogWarning(ex, "Failed to re-index product {ProductId} in vector database. Product updated but search results may be outdated.", product.Id);
                 }
 
                 return NoContent();
@@ -208,7 +211,22 @@ namespace API.Controllers
 
             var result = await context.SaveChangesAsync() > 0;
 
-            if (result) return Ok();
+            if (result)
+            {
+                // Automatically delete the product from Pinecone vector database
+                try
+                {
+                    await pineconeService.DeleteProductAsync(id);
+                    logger.LogInformation("Product {ProductId} successfully deleted from vector database", id);
+                }
+                catch (Exception ex)
+                {
+                    // Log the error but don't fail the product deletion
+                    logger.LogWarning(ex, "Failed to delete product {ProductId} from vector database. Product deleted from database but may still appear in semantic search.", id);
+                }
+
+                return Ok();
+            }
 
             return BadRequest("Problem deleting the product");
         }

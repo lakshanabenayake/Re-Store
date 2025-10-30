@@ -33,10 +33,12 @@ namespace API.Services
 
             var requestBody = new
             {
-                model = MODEL,
-                instances = new[]
+                content = new
                 {
-                    new { content = text }
+                    parts = new[]
+                    {
+                        new { text = text }
+                    }
                 }
             };
 

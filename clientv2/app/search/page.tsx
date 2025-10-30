@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useSearchParams } from "next/navigation"
 import { Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -12,8 +13,18 @@ import Link from "next/link"
 import Image from "next/image"
 
 export default function SemanticSearchPage() {
+  const searchParams = useSearchParams()
   const [searchQuery, setSearchQuery] = useState("")
   const [trigger, { data: searchResults, isLoading, isFetching }] = useLazySemanticSearchQuery()
+
+  // Check for query parameter on mount
+  useEffect(() => {
+    const queryFromUrl = searchParams.get('q')
+    if (queryFromUrl) {
+      setSearchQuery(queryFromUrl)
+      trigger({ query: queryFromUrl, topK: 12 })
+    }
+  }, [searchParams, trigger])
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()

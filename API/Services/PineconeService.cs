@@ -187,5 +187,41 @@ namespace API.Services
 
             _logger.LogInformation("Completed bulk upsert of {Count} products", products.Count);
         }
+
+        /// <summary>
+        /// Deletes a product from Pinecone by its ID
+        /// </summary>
+        public async Task DeleteProductAsync(int productId)
+        {
+            try
+            {
+                _logger.LogInformation("Deleting product {ProductId} from Pinecone", productId);
+
+                var deleteRequest = new
+                {
+                    ids = new[] { productId.ToString() }
+                };
+
+                var json = JsonSerializer.Serialize(deleteRequest);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PostAsync(
+                    $"https://{_indexHost}/vectors/delete",
+                    content);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var error = await response.Content.ReadAsStringAsync();
+                    throw new Exception($"Pinecone delete failed: {response.StatusCode} - {error}");
+                }
+
+                _logger.LogInformation("Successfully deleted product {ProductId} from Pinecone", productId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting product {ProductId} from Pinecone", productId);
+                throw;
+            }
+        }
     }
 }
