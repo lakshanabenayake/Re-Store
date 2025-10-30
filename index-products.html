@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Index Products</title>
+</head>
+<body>
+    <h1>Index Products to Pinecone</h1>
+    <button onclick="indexProducts()">Click to Index All Products</button>
+    <div id="result"></div>
+
+    <script>
+        async function indexProducts() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<p>Indexing in progress... This may take 2-5 minutes.</p>';
+            
+            try {
+                const response = await fetch('http://localhost:5000/api/products/index', {
+                    method: 'POST'
+                });
+                
+                const data = await response.json();
+                resultDiv.innerHTML = `<p style="color: green;">Success! ${JSON.stringify(data)}</p>`;
+            } catch (error) {
+                resultDiv.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html>

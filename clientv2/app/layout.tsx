@@ -1,0 +1,52 @@
+import type React from "react"
+import type { Metadata } from "next"
+import { Geist, Geist_Mono, Inter } from "next/font/google"
+import { Analytics } from "@vercel/analytics/next"
+import "./globals.css"
+import { Navbar } from "@/components/navbar"
+import { Footer } from "@/components/footer"
+import Chatbot from "@/components/Chatbot"
+import StoreProvider from "@/lib/store/StoreProvider"
+import { Toaster } from "sonner"
+import { ThemeProvider } from "@/components/theme-provider"
+
+const _geist = Geist({ subsets: ["latin"] })
+const _geistMono = Geist_Mono({ subsets: ["latin"] })
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-sans",
+})
+
+export const metadata: Metadata = {
+  title: "LUXE - Premium E-Commerce",
+  description: "Curated collection of premium products",
+  generator: "v0.app",
+}
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode
+}>) {
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${inter.variable} font-sans antialiased`}>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="light"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <StoreProvider>
+            <Navbar />
+            <main className="min-h-screen">{children}</main>
+            <Footer />
+            <Chatbot />
+            <Analytics />
+            <Toaster position="bottom-right" richColors />
+          </StoreProvider>
+        </ThemeProvider>
+      </body>
+    </html>
+  )
+}
