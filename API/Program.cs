@@ -6,8 +6,11 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using DotNetEnv;
 
-// Load environment variables from .env file
-Env.Load();
+// Load environment variables from .env file (only if it exists - for local dev)
+if (File.Exists(".env"))
+{
+    Env.Load();
+}
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,10 +22,20 @@ builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
 // Build connection string from environment variables
 var dbServer = Environment.GetEnvironmentVariable("DB_SERVER");
+var dbPort = Environment.GetEnvironmentVariable("DB_PORT") ?? "1433";
 var dbName = Environment.GetEnvironmentVariable("DB_NAME");
 var dbUser = Environment.GetEnvironmentVariable("DB_USER");
 var dbPassword = Environment.GetEnvironmentVariable("DB_PASSWORD");
-var connectionString = $"Server={dbServer};Database={dbName};User Id={dbUser};Password={dbPassword};TrustServerCertificate=True;";
+
+// Log configuration (without password) for debugging
+Console.WriteLine($"Database Configuration: Server={dbServer}:{dbPort}, Database={dbName}, User={dbUser}");
+
+if (string.IsNullOrEmpty(dbServer) || string.IsNullOrEmpty(dbName))
+{
+    Console.WriteLine("WARNING: Database environment variables not configured properly!");
+}
+
+var connectionString = $"Server={dbServer},{dbPort};Database={dbName};User Id={dbUser};Password={dbPassword};TrustServerCertificate=True;Connection Timeout=30;";
 
 builder.Services.AddDbContext<StoreContext>(opt =>
 {
@@ -109,6 +122,19 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-DbInitializer.InitDb(app);
+// Initialize database with error handling
+try
+{
+    Console.WriteLine("Attempting to initialize database...");
+    DbInitializer.InitDb(app);
+    Console.WriteLine("Database initialized successfully");
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"ERROR initializing database: {ex.Message}");
+    Console.WriteLine($"Stack trace: {ex.StackTrace}");
+    // Don't crash the app, just log the error
+}
 
+Console.WriteLine("Application starting...");
 app.Run();
