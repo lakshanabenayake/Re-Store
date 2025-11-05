@@ -14,6 +14,16 @@ if (File.Exists(".env"))
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Configure Kestrel to listen on the port provided by the environment (Azure uses PORT=8080)
+var listenPort = Environment.GetEnvironmentVariable("PORT") ?? Environment.GetEnvironmentVariable("WEBSITES_PORT") ?? "8080";
+builder.WebHost.ConfigureKestrel(options =>
+{
+    if (int.TryParse(listenPort, out var p))
+    {
+        options.ListenAnyIP(p);
+    }
+});
+Console.WriteLine($"Configuring application to listen on port: {listenPort}");
 // Add services to the container
 builder.Services.AddControllers();
 
