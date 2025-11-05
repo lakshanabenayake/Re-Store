@@ -52,6 +52,8 @@ builder.Services.AddDbContext<StoreContext>(opt =>
     opt.UseSqlServer(connectionString);
 });
 
+
+
 // Configure Identity
 builder.Services.AddIdentityCore<User>(opt =>
 {
