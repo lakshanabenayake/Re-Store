@@ -21,7 +21,7 @@ export default function CheckoutPage() {
   ]
 
   const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
-  const shipping = 0
+  const shipping: number = 0
   const tax = subtotal * 0.08
   const total = subtotal + shipping + tax
 
@@ -142,7 +142,11 @@ export default function CheckoutPage() {
             <Card className="p-6 border-0 shadow-sm">
               <h2 className="font-serif text-2xl mb-6">Billing Address</h2>
               <div className="flex items-center gap-2 mb-4">
-                <Checkbox id="sameAsShipping" checked={sameAsShipping} onCheckedChange={setSameAsShipping} />
+                <Checkbox 
+                  id="sameAsShipping" 
+                  checked={sameAsShipping} 
+                  onCheckedChange={(checked) => setSameAsShipping(checked === true)} 
+                />
                 <Label htmlFor="sameAsShipping" className="text-sm font-normal cursor-pointer">
                   Same as shipping address
                 </Label>

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import { useSearchParams } from "next/navigation"
 import { Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -12,7 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import Link from "next/link"
 import Image from "next/image"
 
-export default function SemanticSearchPage() {
+function SemanticSearchContent() {
   const searchParams = useSearchParams()
   const [searchQuery, setSearchQuery] = useState("")
   const [trigger, { data: searchResults, isLoading, isFetching }] = useLazySemanticSearchQuery()
@@ -186,5 +186,22 @@ export default function SemanticSearchPage() {
         )}
       </div>
     </div>
+  )
+}
+
+export default function SemanticSearchPage() {
+  return (
+    <Suspense fallback={
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-8">
+            <h1 className="text-4xl font-bold mb-2">Smart Product Search</h1>
+            <p className="text-muted-foreground">Loading...</p>
+          </div>
+        </div>
+      </div>
+    }>
+      <SemanticSearchContent />
+    </Suspense>
   )
 }

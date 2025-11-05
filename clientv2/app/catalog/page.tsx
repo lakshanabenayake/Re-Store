@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -12,7 +12,7 @@ import ProductList from "@/components/catalog/ProductList"
 import { Product } from "@/lib/models/product"
 import { useSearchParams } from "next/navigation"
 
-export default function CatalogPage() {
+function CatalogContent() {
   const { data: productsResponse, isLoading, error } = useFetchProductsQuery({ 
     pageSize: 50 // Fetch more products for catalog
   })
@@ -221,5 +221,18 @@ export default function CatalogPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function CatalogPage() {
+  return (
+    <Suspense fallback={
+      <div className="container mx-auto px-4 py-12">
+        <h1 className="text-4xl font-bold mb-8">Shop All Products</h1>
+        <p className="text-muted-foreground">Loading...</p>
+      </div>
+    }>
+      <CatalogContent />
+    </Suspense>
   )
 }

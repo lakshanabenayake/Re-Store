@@ -1,6 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Output configuration for Azure Static Web Apps
+  output: 'standalone',
+  
   images: {
     remotePatterns: [
       {
@@ -14,6 +17,9 @@ const nextConfig: NextConfig = {
       }
     ],
   },
+  
+  // Optional: Enable if you need trailing slashes
+  // trailingSlash: true,
 };
 
 export default nextConfig;
