@@ -23,9 +23,8 @@ namespace API.Data
 
         private static async Task SeedData(StoreContext context, UserManager<User> userManager, RoleManager<IdentityRole> roleManager)
         {
-            // Drop and recreate the database (use only in development)
-            context.Database.EnsureDeleted();
-            context.Database.Migrate();
+            // Apply any pending migrations
+            await context.Database.MigrateAsync();
 
             // Seed Roles
             if (!await roleManager.RoleExistsAsync("Member"))
