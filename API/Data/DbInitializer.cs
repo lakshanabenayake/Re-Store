@@ -23,8 +23,42 @@ namespace API.Data
 
         private static async Task SeedData(StoreContext context, UserManager<User> userManager, RoleManager<IdentityRole> roleManager)
         {
-            // Apply any pending migrations
-            await context.Database.MigrateAsync();
+            try
+            {
+                // Test database connection first
+                Console.WriteLine("Testing database connection...");
+                var canConnect = await context.Database.CanConnectAsync();
+                if (!canConnect)
+                {
+                    Console.WriteLine("❌ Cannot connect to database. Check connection string and firewall rules.");
+                    return;
+                }
+                Console.WriteLine("✅ Database connection successful");
+
+                // Apply any pending migrations
+                Console.WriteLine("Checking for pending database migrations...");
+                var pendingMigrations = await context.Database.GetPendingMigrationsAsync();
+                if (pendingMigrations.Any())
+                {
+                    Console.WriteLine($"Applying {pendingMigrations.Count()} pending migrations...");
+                    foreach (var migration in pendingMigrations)
+                    {
+                        Console.WriteLine($"  - {migration}");
+                    }
+                    await context.Database.MigrateAsync();
+                    Console.WriteLine("✅ Migrations applied successfully");
+                }
+                else
+                {
+                    Console.WriteLine("✅ Database is up to date, no migrations needed");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Error during database migration: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                throw; // Re-throw to prevent app from starting with broken DB
+            }
 
             // Seed Roles
             if (!await roleManager.RoleExistsAsync("Member"))

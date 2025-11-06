@@ -137,15 +137,25 @@ app.MapControllers();
 // Initialize database with error handling
 try
 {
+    Console.WriteLine("=== DATABASE INITIALIZATION START ===");
     Console.WriteLine("Attempting to initialize database...");
     DbInitializer.InitDb(app);
-    Console.WriteLine("Database initialized successfully");
+    Console.WriteLine("✅ Database initialized successfully");
+    Console.WriteLine("=== DATABASE INITIALIZATION COMPLETE ===");
 }
 catch (Exception ex)
 {
-    Console.WriteLine($"ERROR initializing database: {ex.Message}");
+    Console.WriteLine("=== DATABASE INITIALIZATION FAILED ===");
+    Console.WriteLine($"❌ ERROR initializing database: {ex.Message}");
+    Console.WriteLine($"Exception type: {ex.GetType().Name}");
+    if (ex.InnerException != null)
+    {
+        Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
+    }
     Console.WriteLine($"Stack trace: {ex.StackTrace}");
-    // Don't crash the app, just log the error
+    Console.WriteLine("⚠️  App will start anyway, but database features may not work");
+    Console.WriteLine("===========================================");
+    // Don't crash the app, just log the error and continue
 }
 
 Console.WriteLine("Application starting...");
