@@ -135,28 +135,28 @@ app.UseAuthorization();
 app.MapControllers();
 
 // Initialize database with error handling
-try
-{
-    Console.WriteLine("=== DATABASE INITIALIZATION START ===");
-    Console.WriteLine("Attempting to initialize database...");
-    await DbInitializer.InitDb(app);
-    Console.WriteLine("✅ Database initialized successfully");
-    Console.WriteLine("=== DATABASE INITIALIZATION COMPLETE ===");
-}
-catch (Exception ex)
-{
-    Console.WriteLine("=== DATABASE INITIALIZATION FAILED ===");
-    Console.WriteLine($"❌ ERROR initializing database: {ex.Message}");
-    Console.WriteLine($"Exception type: {ex.GetType().Name}");
-    if (ex.InnerException != null)
-    {
-        Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
-    }
-    Console.WriteLine($"Stack trace: {ex.StackTrace}");
-    Console.WriteLine("===========================================");
-    // Re-throw to prevent app from starting with broken database
-    throw;
-}
+// try
+// {
+//     Console.WriteLine("=== DATABASE INITIALIZATION START ===");
+//     Console.WriteLine("Attempting to initialize database...");
+//     await DbInitializer.InitDb(app);
+//     Console.WriteLine("✅ Database initialized successfully");
+//     Console.WriteLine("=== DATABASE INITIALIZATION COMPLETE ===");
+// }
+// catch (Exception ex)
+// {
+//     Console.WriteLine("=== DATABASE INITIALIZATION FAILED ===");
+//     Console.WriteLine($"❌ ERROR initializing database: {ex.Message}");
+//     Console.WriteLine($"Exception type: {ex.GetType().Name}");
+//     if (ex.InnerException != null)
+//     {
+//         Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
+//     }
+//     Console.WriteLine($"Stack trace: {ex.StackTrace}");
+//     Console.WriteLine("===========================================");
+//     // Re-throw to prevent app from starting with broken database
+//     throw;
+// }
 
 Console.WriteLine("Application starting...");
 app.Run();

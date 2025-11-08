@@ -35,27 +35,27 @@ namespace API.Data
                 }
                 Console.WriteLine("✅ Database connection successful");
 
-                // Apply any pending migrations
-                Console.WriteLine("Checking for pending database migrations...");
-                var pendingMigrations = await context.Database.GetPendingMigrationsAsync();
-                if (pendingMigrations.Any())
+                // Ensure database exists and run migrations
+                Console.WriteLine("Ensuring database exists and applying migrations...");
+                await context.Database.MigrateAsync();
+                Console.WriteLine("✅ Database migrations completed");
+
+                // Verify tables exist by checking if we can query them
+                Console.WriteLine("Verifying database tables...");
+                try
                 {
-                    Console.WriteLine($"Applying {pendingMigrations.Count()} pending migrations...");
-                    foreach (var migration in pendingMigrations)
-                    {
-                        Console.WriteLine($"  - {migration}");
-                    }
-                    await context.Database.MigrateAsync();
-                    Console.WriteLine("✅ Migrations applied successfully");
+                    var productCount = await context.Products.CountAsync();
+                    Console.WriteLine($"✅ Products table exists (count: {productCount})");
                 }
-                else
+                catch (Exception ex)
                 {
-                    Console.WriteLine("✅ Database is up to date, no migrations needed");
+                    Console.WriteLine($"❌ Products table verification failed: {ex.Message}");
+                    throw;
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"❌ Error during database migration: {ex.Message}");
+                Console.WriteLine($"❌ Error during database initialization: {ex.Message}");
                 Console.WriteLine($"Stack trace: {ex.StackTrace}");
                 throw; // Re-throw to prevent app from starting with broken DB
             }
