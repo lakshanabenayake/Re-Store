@@ -139,7 +139,7 @@ try
 {
     Console.WriteLine("=== DATABASE INITIALIZATION START ===");
     Console.WriteLine("Attempting to initialize database...");
-    DbInitializer.InitDb(app);
+    await DbInitializer.InitDb(app);
     Console.WriteLine("✅ Database initialized successfully");
     Console.WriteLine("=== DATABASE INITIALIZATION COMPLETE ===");
 }
@@ -153,9 +153,9 @@ catch (Exception ex)
         Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
     }
     Console.WriteLine($"Stack trace: {ex.StackTrace}");
-    Console.WriteLine("⚠️  App will start anyway, but database features may not work");
     Console.WriteLine("===========================================");
-    // Don't crash the app, just log the error and continue
+    // Re-throw to prevent app from starting with broken database
+    throw;
 }
 
 Console.WriteLine("Application starting...");

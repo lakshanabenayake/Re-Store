@@ -7,7 +7,7 @@ namespace API.Data
 {
     public class DbInitializer
     {
-        public static async void InitDb(WebApplication app)
+        public static async Task InitDb(WebApplication app)
         {
             using var scope = app.Services.CreateScope();
 
