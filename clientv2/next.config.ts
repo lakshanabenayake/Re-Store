@@ -2,7 +2,8 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   // Output configuration for Azure Static Web Apps
-  output: 'standalone',
+  // Use 'export' for static generation or remove for hybrid rendering with Azure SWA
+  // output: 'export',
   
   images: {
     remotePatterns: [
@@ -16,6 +17,8 @@ const nextConfig: NextConfig = {
         pathname: '/**',
       }
     ],
+    // Disable image optimization for static export if using output: 'export'
+    // unoptimized: true,
   },
   
   // Optional: Enable if you need trailing slashes
