@@ -134,5 +134,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+// DbInitializer.InitDb(app);
+
 Console.WriteLine("Application starting...");
 app.Run();

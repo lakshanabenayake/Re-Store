@@ -7,11 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- Ensure migrations are included in publish -->
-    <Compile Include="Migrations\**\*.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
     <PackageReference Include="CloudinaryDotNet" Version="1.26.2" />
     <PackageReference Include="DotNetEnv" Version="3.1.1" />

@@ -13,7 +13,7 @@ namespace API.Services
         private readonly ILogger<GeminiChatService> _logger;
         private readonly StoreContext _context;
         private readonly PineconeService _pineconeService;
-        private const string MODEL = "gemini-1.5-flash"; // Using Gemini 1.5 Flash for chat
+        private const string MODEL = "gemini-2.5-flash"; // Using Gemini 1.0 Pro model
 
         public GeminiChatService(
             IConfiguration configuration,
@@ -48,6 +48,26 @@ namespace API.Services
                 // Build conversation history
                 var contents = new List<object>();
 
+                // Add system instruction as the first message
+                contents.Add(new
+                {
+                    role = "user",
+                    parts = new[]
+                    {
+                        new { text = systemInstruction }
+                    }
+                });
+
+                // Add a model response to establish the system context
+                contents.Add(new
+                {
+                    role = "model",
+                    parts = new[]
+                    {
+                        new { text = "Understood. I'm ready to help customers with their shopping needs at ReStore." }
+                    }
+                });
+
                 // Add previous conversation history if exists
                 if (conversationHistory != null && conversationHistory.Any())
                 {
@@ -66,13 +86,6 @@ namespace API.Services
 
                 var requestBody = new
                 {
-                    systemInstruction = new  // Changed from system_instruction
-                    {
-                        parts = new[]
-                        {
-                    new { text = systemInstruction }
-                }
-                    },
                     contents = contents,
                     generationConfig = new
                     {
